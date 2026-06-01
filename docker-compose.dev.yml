@@ -28,7 +28,7 @@ services:
     env_file:
       - .env
     ports:
-      - ":3000"
+      - "${BACK_HOST_PORT_DEV}:3000"
     depends_on:
       stocky-db:
         condition: service_healthy
