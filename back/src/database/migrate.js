@@ -1,75 +1,100 @@
-const fs = require('fs/promises');
-const path = require('path');
+import { readdir, readFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const MIGRATIONS_DIR = path.resolve(__dirname, './migrations');
-const TABLE_NAME = 'migrations';
+import chalk from "chalk";
+import { PrismaClient } from "@prisma/client";
+import { config } from "dotenv";
 
-const ensureMigrationsTable = async (db) => {
-    const sql = `
-        CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
-            nome_arquivo VARCHAR(200) PRIMARY KEY
-        )
-    `;
+const currentDir = dirname(fileURLToPath(import.meta.url));
+const migrationsDir = resolve(currentDir, "migrations");
+const envPath = resolve(currentDir, "../../../.env");
 
-    await db.query(sql);
+config({ path: envPath });
+
+const requiredEnvVars = ["DB_HOST", "DB_PORT", "DB_USER", "DB_PASS", "DB_NAME"];
+const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
+
+if (missingEnvVars.length > 0) {
+  throw new Error(
+    `Variaveis de ambiente obrigatorias ausentes: ${missingEnvVars.join(", ")}`
+  );
+}
+
+const databaseUrl = `postgresql://${encodeURIComponent(
+  process.env.DB_USER
+)}:${encodeURIComponent(process.env.DB_PASS)}@${process.env.DB_HOST}:${
+  process.env.DB_PORT
+}/${process.env.DB_NAME}`;
+
+const db = new PrismaClient({
+  datasourceUrl: databaseUrl,
+});
+
+const ensureMigrationsTable = async () => {
+  await db.$executeRaw`
+    CREATE TABLE IF NOT EXISTS migrations (
+      nome_arquivo VARCHAR(200) PRIMARY KEY,
+      executada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `;
 };
 
 const getMigrationFiles = async () => {
-    const files = await fs.readdir(MIGRATIONS_DIR);
+  const files = await readdir(migrationsDir);
 
-    return files
-        .filter((fileName) => fileName.toLowerCase().endsWith('.sql'))
-        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  return files
+    .filter((fileName) => fileName.toLowerCase().endsWith(".sql"))
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 };
 
-const getAppliedMigrations = async (db) => {
-    const result = await db.query(`SELECT nome_arquivo FROM ${TABLE_NAME}`);
-    return new Set(result.rows.map((row) => row.nome_arquivo));
+const hasMigrationRun = async (fileName) => {
+  const rows = await db.$queryRaw`
+    SELECT 1
+    FROM migrations
+    WHERE nome_arquivo = ${fileName}
+    LIMIT 1
+  `;
+
+  return rows.length > 0;
+};
+
+const runMigration = async (fileName) => {
+  const migrationPath = resolve(migrationsDir, fileName);
+  const sql = await readFile(migrationPath, "utf8");
+
+  await db.$transaction(async (tx) => {
+    await tx.$executeRawUnsafe(sql);
+    await tx.$executeRaw`
+      INSERT INTO migrations (nome_arquivo)
+      VALUES (${fileName})
+    `;
+  });
 };
 
 const run = async () => {
-    const { default: db } = await import('../pages/api/config/connectDB.js');
+  try {
+    await ensureMigrationsTable();
 
-    try {
-        await ensureMigrationsTable(db);
+    const files = await getMigrationFiles();
 
-        const [files, applied] = await Promise.all([
-            getMigrationFiles(),
-            getAppliedMigrations(db),
-        ]);
+    for (const fileName of files) {
+      if (await hasMigrationRun(fileName)) {
+        console.log(`${chalk.yellow("[SKIP]")} ${fileName}`);
+        continue;
+      }
 
-        for (const fileName of files) {
-            if (applied.has(fileName)) {
-                console.log(`[SKIP] ${fileName}`);
-                continue;
-            }
-
-            const migrationPath = path.join(MIGRATIONS_DIR, fileName);
-            const sql = await fs.readFile(migrationPath, 'utf8');
-
-            await db.query('BEGIN');
-            try {
-                console.log(`[EXECUTING] ${fileName}`);
-                await db.query(sql);
-                await db.query(
-                    `INSERT INTO ${TABLE_NAME} (nome_arquivo) VALUES ($1)`,
-                    [fileName]
-                );
-                await db.query('COMMIT');
-                console.log(`[OK] ${fileName}`);
-            } catch (error) {
-                await db.query('ROLLBACK');
-                throw error;
-            }
-        }
-
-        console.log('Migrações finalizadas');
-    } catch (error) {
-        console.error('Erro ao executar migrações:', error);
-        process.exitCode = 1;
-    } finally {
-        await db.end();
+      console.log(`${chalk.blue("[EXECUTING]")} ${fileName}`);
+      await runMigration(fileName);
     }
+
+    console.log(chalk.green("Migrações finalizadas"));
+  } catch (error) {
+    console.error(chalk.red("Erro ao executar migrações:"), error);
+    process.exitCode = 1;
+  } finally {
+    await db.$disconnect();
+  }
 };
 
 run();
