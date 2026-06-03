@@ -1,0 +1,155 @@
+openapi: 3.1.0
+info:
+  title: Stocky API
+  version: 0.1.0
+  description: API REST do sistema Stocky.
+servers:
+  - url: http://localhost:3000
+    description: Ambiente local do back-end
+tags:
+  - name: Usuarios
+    description: Gerenciamento de usuarios.
+paths:
+  /usuarios:
+    post:
+      tags:
+        - Usuarios
+      summary: Criar usuario
+      description: Cria um novo usuario e retorna os dados publicos do cadastro.
+      operationId: criarUsuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CriarUsuarioRequest"
+            examples:
+              usuarioAtivo:
+                summary: Usuario ativo
+                value:
+                  nome: Maria Silva
+                  cpf: "12345678901"
+                  email: maria.silva@example.com
+                  senha: senha-segura
+                  ativo: true
+      responses:
+        "201":
+          description: Usuario criado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Usuario"
+              examples:
+                usuarioCriado:
+                  value:
+                    id: 1
+                    nome: Maria Silva
+                    cpf: "12345678901"
+                    email: maria.silva@example.com
+                    ativo: true
+        "400":
+          description: Campos obrigatorios ausentes.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                camposObrigatoriosAusentes:
+                  value:
+                    error: Campos obrigatorios ausentes
+                    details:
+                      fields:
+                        - nome
+                        - cpf
+        "409":
+          description: Usuario ja cadastrado por campo unico.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                registroJaCadastrado:
+                  value:
+                    error: Registro ja cadastrado
+                    details:
+                      fields:
+                        - email
+        "500":
+          description: Erro inesperado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                erroInterno:
+                  value:
+                    error: Erro interno do servidor
+components:
+  schemas:
+    CriarUsuarioRequest:
+      type: object
+      additionalProperties: true
+      required:
+        - nome
+        - cpf
+        - email
+        - senha
+      properties:
+        nome:
+          type: string
+          example: Maria Silva
+        cpf:
+          type: string
+          minLength: 11
+          maxLength: 11
+          example: "12345678901"
+        email:
+          type: string
+          format: email
+          example: maria.silva@example.com
+        senha:
+          type: string
+          format: password
+          example: senha-segura
+        ativo:
+          type: boolean
+          default: true
+          example: true
+    Usuario:
+      type: object
+      required:
+        - id
+        - nome
+        - cpf
+        - email
+        - ativo
+      properties:
+        id:
+          type: integer
+          example: 1
+        nome:
+          type: string
+          example: Maria Silva
+        cpf:
+          type: string
+          minLength: 11
+          maxLength: 11
+          example: "12345678901"
+        email:
+          type: string
+          format: email
+          example: maria.silva@example.com
+        ativo:
+          type: boolean
+          example: true
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: Campos obrigatorios ausentes
+        details:
+          type: object
+          additionalProperties: true

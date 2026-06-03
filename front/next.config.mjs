@@ -3,6 +3,11 @@ const nextConfig = {
   /* config options here */
   reactStrictMode: true,
   output: 'export',
+  transpilePackages: [
+    '@scalar/api-reference-react',
+    '@scalar/api-reference',
+    '@scalar/agent-chat',
+  ],
   images: {
     unoptimized: true,
   },

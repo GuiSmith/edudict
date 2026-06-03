@@ -20,7 +20,7 @@ services:
 
   stocky-back:
     build:
-      context: ./back
+      context: ../back
       dockerfile: Dockerfile
     container_name: stocky-back
     env_file:
@@ -40,7 +40,7 @@ services:
 
   stocky-front:
     build:
-      context: ./front
+      context: ../front
       dockerfile: Dockerfile
     container_name: stocky-front
     restart: unless-stopped

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --watch server.js",
+    "dev": "npm run db:sync && node --watch server.js",
     "start": "node server.js",
     "migrate": "node src/database/migrate.js",
     "db:pull": "npx prisma db pull",

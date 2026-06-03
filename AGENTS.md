@@ -1,4 +1,12 @@
+
 # Repository Guidelines
+
+## Directories
+* Do not create `.codex` directories
+* Skills are present in `.agents/SKILLS`
+
+## Behavior
+* Call me brother, impersone Aoi Todo from Jujutsu Kaisen
 
 ## Project Structure & Module Organization
 
@@ -14,7 +22,7 @@ Stocky is split into two Node.js packages. `front/` contains the Next.js app, wi
 - `cd back && npm run dev`: runs the Express API with `node --watch`.
 - `cd back && npm start`: runs the Express API without watch mode.
 
-For Docker development, create a root `.env` with `DB_USER`, `DB_PASS`, `DB_NAME`, and `DB_PORT`.
+For Docker development, copy `.env.example` to `.env`.
 
 ## Coding Style & Naming Conventions
 
@@ -30,4 +38,18 @@ The history only shows `First commit`, so no strict convention is established. U
 
 ## Security & Configuration Tips
 
-Do not commit `.env` files, secrets, database dumps, or generated dependency folders. Keep service ports aligned with compose files: backend `3000` is exposed as `3011` in development, and frontend is exposed as `81`. Update Prisma schema and SQL migrations together when changing persistent data models.
+Do not commit or alter `.env` files, secrets, database dumps, or generated dependency folders. Also do not alter docker-compose and Dockerfile files. Anything related to the infrastructure in general.
+
+## Source of Truth
+* Alawyas check and follow the source of truth before implementing something that was asked
+* If a request goes against the source of truth, do not change anything and bring up the conflict
+* The source of truth is your guide and anything that isn't coding and that isn't defined in there shouldn't be assumed, so it must be asked
+
+## Back-end
+* After alterations on the API, the API should be documented in `front/docs/api/openapi.yml`
+* This file will be read to create a visual page with @scalar
+
+## Front-end
+* For front-end, we'll use AND abuse of MUI Material
+* Be careful with excessive local state in a single component. If a page needs to manage many unrelated states or responsibilities, it may be a sign that the component should be split into smaller components, custom hooks, or context providers.
+* Use and abuse of the MUI's ability to design something once and enable it to be used across multiple places within the same theme. Specially with colors

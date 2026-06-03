@@ -23,7 +23,7 @@ services:
     container_name: stocky-dev-back
     working_dir: /app
     volumes:
-      - ./back:/app
+      - ../back:/app
       - back-node-modules:/app/node_modules
     env_file:
       - .env
@@ -46,7 +46,7 @@ services:
     container_name: stocky-dev-front
     working_dir: /app
     volumes:
-      - ./front:/app
+      - ../front:/app
       - front-node-modules:/app/node_modules
     ports:
       - "${FRONT_HOST_PORT_DEV}:3000"
