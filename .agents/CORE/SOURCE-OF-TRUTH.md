@@ -150,9 +150,64 @@ Por enquanto, ainda não será implementado.
 
 #### `log.middleware.js`
 
-Middleware reservado para logs da aplicação.
+Middleware global responsável por registrar logs de requisições HTTP da API.
 
-Por enquanto, ainda não será implementado.
+O middleware deverá ser registrado antes das rotas para conseguir acompanhar todo o ciclo da requisição e deverá salvar o log apenas depois que a resposta terminar, usando o evento:
+
+`res.on("finish", ...)`
+
+O middleware deverá registrar os logs na tabela:
+
+`log_api`
+
+Cada requisição processada pela API deverá gerar um registro, incluindo rotas públicas e rotas autenticadas.
+
+A rota `/health` não deverá gerar log em `log_api`, para evitar ruído de healthcheck.
+
+Quando a requisição tiver usuário autenticado em `req.user`, o log deverá salvar:
+
+`id_usuario = req.user.id`
+
+Quando a requisição não tiver usuário autenticado, o log deverá salvar:
+
+`id_usuario = null`
+
+O middleware deverá capturar:
+
+* método HTTP
+* rota/path
+* URL original
+* status code final da resposta
+* IP de origem
+* user-agent
+* referer
+* params
+* query
+* body
+* body da resposta, quando possível
+* tempo total da resposta em milissegundos
+* usuário autenticado, quando existir
+* indicador de erro
+* mensagem de erro retornada, quando existir
+
+O body da resposta deverá ser capturado interceptando `res.json`, sem alterar o comportamento original da resposta.
+
+O middleware não deverá registrar `stack_trace`.
+
+Antes de persistir o body da requisição, o middleware deverá sanitizar dados sensíveis.
+
+Campos sensíveis conhecidos:
+
+* `password`
+* `senha`
+
+Payloads de upload, `multipart/form-data` ou conteúdo binário não deverão ser persistidos como conteúdo bruto.
+
+Caso ocorra erro ao salvar o log no banco, o middleware não deverá quebrar a requisição nem alterar a resposta enviada ao cliente.
+
+Falhas de persistência do log deverão ser registradas apenas com:
+
+`console.error`
 
 #### `error.middleware.js`
 
