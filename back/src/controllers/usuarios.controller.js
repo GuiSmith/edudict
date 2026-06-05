@@ -1,4 +1,4 @@
-import criarUsuarioDTO from "../dtos/criar-usuario.dto.js";
+import criarUsuarioDTO from "../dtos/usuario/criar-usuario.dto.js";
 import usuariosService from "../services/usuarios.service.js";
 
 const criarUsuario = async (req, res) => {

@@ -87,6 +87,7 @@ O sistema terá:
 * Repositories (OPCIONAL): arquivos que contém consultas SQL personalizadas e complexas demais para o ORM comum
 * Errors: arquivos que contém classes de erros personalizadas, sendo Error -> AppError -> TypeError
 * Middlewares: arquivos que contém códigos a serem executados antes ou depois de uma requisição
+* Utils: arquivos com funções puras e reutilizáveis por todo o back-end, sem acesso a banco, request, response ou regra de negócio
 
 ## Estrutura sugerida do back-end
 
@@ -225,6 +226,10 @@ O middleware global também deverá registrar erros inesperados com `console.err
 ### DTOs
 
 * DTOs serão responsáveis por validar, filtrar, normalizar e padronizar dados recebidos pela API
+* DTOs devem ficar agrupados por entidade ou domínio dentro de `src/dtos`
+* Exemplos de estrutura:
+  * `src/dtos/auth/login.dto.js`
+  * `src/dtos/usuario/criar-usuario.dto.js`
 * DTOs não deverão conter regra de negócio
 * DTOs deverão validar apenas estrutura e formato dos dados
 * DTOs poderão:
@@ -255,6 +260,18 @@ O middleware global também deverá registrar erros inesperados com `console.err
 * `services/estoque.service.js`
 * `services/inventarios.service.js`
 * `services/email.service.js`
+
+### Utils
+
+* Cada arquivo em `src/utils` deve representar um utilitário reutilizável por múltiplas camadas do back-end
+* Utils devem conter funções puras ou helpers determinísticos sempre que possível
+* Utils não devem acessar banco de dados
+* Utils não devem conhecer objetos de HTTP como `req`, `res`, cookies ou headers
+* Utils não devem lançar erros de regra de negócio ou erros HTTP específicos, a menos que o próprio utilitário tenha sido definido para validação genérica
+* Exemplos:
+* `utils/cpf.js`
+* `utils/email.js`
+* `utils/date.js`
 
 ### Repositories
 
@@ -357,9 +374,10 @@ Será usado para padronizar entrada da API.
 
 ### Exemplos
 
-* `dtos/produtos/criarProduto.dto.js`
-* `dtos/usuarios/criarUsuario.dto.js`
-* `dtos/inventarios/registrarInventario.dto.js`
+* `dtos/auth/login.dto.js`
+* `dtos/usuario/criar-usuario.dto.js`
+* `dtos/produto/criar-produto.dto.js`
+* `dtos/inventario/registrar-inventario.dto.js`
 
 ### Motivo
 
@@ -669,4 +687,3 @@ O projeto deverá entregar:
   * arquitetura
   * padrões aplicados
   * organização do código
-
