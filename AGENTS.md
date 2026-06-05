@@ -19,8 +19,10 @@
 * If the skill is ambiguous, do not use it.
 
 ## Clean work tree
-* When the work tree is not clean, refuse to work on new tasks if the context differs from the current work tree. Let's call this rule *clean work tree*
-* If you refused to act on a new task because of the rule *clean work tree*, write down two things in a new file inside the directory `.agents/TASKS/QUEUE`
+* When the following conditions are met, refuse to work on new tasks if the context differs from the current work tree. Let's call this rule *clean work tree*:
+    1. work tree is not clean
+    2. the files inside `.agents/TASKS` should not be considered in the condition number 1
+* If you refused to act on a new task because of the rule *clean work tree*, write down the following two things in a new file inside the directory `.agents/TASKS/QUEUE` in the format of a given TASK:
     1. The actual prompt of the task 
     2. Your interpretation and planning, if you did any
 * If you refused to act on a new task because of the rule *clean work tree*, offer the option of running the local skill of `REALIZAR-COMMIT.md`
