@@ -62,17 +62,18 @@ paths:
                         - nome
                         - cpf
         "409":
-          description: Usuario ja cadastrado por campo unico.
+          description: Usuario ja cadastrado com o mesmo CPF ou e-mail.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
               examples:
-                registroJaCadastrado:
+                usuarioJaCadastrado:
                   value:
-                    error: Registro ja cadastrado
+                    error: Usuário já cadastrado
                     details:
                       fields:
+                        - cpf
                         - email
         "500":
           description: Erro inesperado.
