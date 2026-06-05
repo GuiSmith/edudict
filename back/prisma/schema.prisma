@@ -20,6 +20,7 @@ model usuario {
   senha   String
   ativo   Boolean   @default(true)
   log_api log_api[]
+  log_app log_app[]
   tokens  token[]
 }
 
@@ -51,4 +52,16 @@ model log_api {
   erro             Boolean  @default(false)
   erro_mensagem    String?
   usuario          usuario? @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model log_app {
+  id         BigInt   @id @default(autoincrement())
+  id_usuario Int?
+  data_hora  DateTime @default(dbgenerated("LOCALTIMESTAMP")) @db.Timestamp(6)
+  tabela     String   @db.VarChar(100)
+  id_tabela  BigInt?
+  operacao   String   @db.VarChar(10)
+  antes      Json?
+  depois     Json?
+  usuario    usuario? @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

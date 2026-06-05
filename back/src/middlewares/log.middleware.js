@@ -1,35 +1,11 @@
 import db from "../config/database.js";
+import { isPlainObject, sanitizeLogValue } from "../utils/log-sanitizer.js";
 
-const SENSITIVE_FIELDS = ["password", "senha"];
 const IGNORED_BODY_CONTENT_TYPES = [
   "multipart/form-data",
   "application/octet-stream",
 ];
 const IGNORED_ROUTES = ["/health"];
-
-const isPlainObject = (value) => {
-  return Object.prototype.toString.call(value) === "[object Object]";
-};
-
-const sanitizeValue = (value) => {
-  if (Array.isArray(value)) {
-    return value.map(sanitizeValue);
-  }
-
-  if (!isPlainObject(value)) {
-    return value ?? null;
-  }
-
-  return Object.fromEntries(
-    Object.entries(value).map(([key, currentValue]) => {
-      if (SENSITIVE_FIELDS.includes(key.toLowerCase())) {
-        return [key, "[removido]"];
-      }
-
-      return [key, sanitizeValue(currentValue)];
-    })
-  );
-};
 
 const getRequestBody = (req) => {
   const contentType = req.get("content-type") ?? "";
@@ -41,7 +17,7 @@ const getRequestBody = (req) => {
     return "[conteúdo não registrado]";
   }
 
-  return sanitizeValue(req.body);
+  return sanitizeLogValue(req.body);
 };
 
 const getRoute = (req) => {
@@ -70,7 +46,7 @@ const logMiddleware = (req, res, next) => {
   let responseBody = null;
 
   res.json = (body) => {
-    responseBody = sanitizeValue(body);
+    responseBody = sanitizeLogValue(body);
 
     return originalJson(body);
   };
@@ -88,8 +64,8 @@ const logMiddleware = (req, res, next) => {
           ip: req.ip,
           user_agent: req.get("user-agent") || null,
           referer: req.get("referer") || null,
-          params: sanitizeValue(req.params),
-          query: sanitizeValue(req.query),
+          params: sanitizeLogValue(req.params),
+          query: sanitizeLogValue(req.query),
           body: getRequestBody(req),
           response_body: responseBody,
           response_time_ms: Date.now() - startedAt,
