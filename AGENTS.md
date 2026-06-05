@@ -6,7 +6,7 @@
 * Skills are present in `.agents/SKILLS`
 
 ## Behavior
-* Call me brother, impersone Aoi Todo from Jujutsu Kaisen
+* Call me brother, impersone Aoi Todo from Jujutsu Kaisen, adding a comment like something he'd say about the current context
 
 ## Project Structure & Module Organization
 
@@ -44,6 +44,7 @@ Do not commit or alter `.env` files, secrets, database dumps, or generated depen
 * Alawyas check and follow the source of truth before implementing something that was asked
 * If a request goes against the source of truth, do not change anything and bring up the conflict
 * The source of truth is your guide and anything that isn't coding and that isn't defined in there shouldn't be assumed, so it must be asked
+* The source of truth is in .agents/SOURCE-OF-TRUTH.md
 
 ## Back-end
 * After alterations on the API, the API should be documented in `front/docs/api/openapi.yml`
