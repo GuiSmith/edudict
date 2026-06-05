@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 
 import db from "../config/database.js";
 import ConflictError from "../errors/conflict.error.js";
+import { criarLog } from "./log-app.service.js";
 
 const SALT_ROUNDS = 10;
 
@@ -10,8 +11,8 @@ const sanitizeUsuario = (usuario) => {
   return safeUsuario;
 };
 
-const cpfJaCadastrado = async (cpf) => {
-  const usuario = await db.usuario.findUnique({
+const cpfJaCadastrado = async (dbClient, cpf) => {
+  const usuario = await dbClient.usuario.findUnique({
     where: {
       cpf,
     },
@@ -23,8 +24,8 @@ const cpfJaCadastrado = async (cpf) => {
   return Boolean(usuario);
 };
 
-const emailJaCadastrado = async (email) => {
-  const usuario = await db.usuario.findUnique({
+const emailJaCadastrado = async (dbClient, email) => {
+  const usuario = await dbClient.usuario.findUnique({
     where: {
       email,
     },
@@ -36,38 +37,50 @@ const emailJaCadastrado = async (email) => {
   return Boolean(usuario);
 };
 
-const criarUsuario = async (usuarioDTO) => {
-  const [cpfCadastrado, emailCadastrado] = await Promise.all([
-    cpfJaCadastrado(usuarioDTO.cpf),
-    emailJaCadastrado(usuarioDTO.email),
-  ]);
+const criarUsuario = async (usuarioDTO, usuarioResponsavelId = null) => {
+  return db.$transaction(async (tx) => {
+    const [cpfCadastrado, emailCadastrado] = await Promise.all([
+      cpfJaCadastrado(tx, usuarioDTO.cpf),
+      emailJaCadastrado(tx, usuarioDTO.email),
+    ]);
 
-  const fields = [];
+    const fields = [];
 
-  if (cpfCadastrado) {
-    fields.push("cpf");
-  }
+    if (cpfCadastrado) {
+      fields.push("cpf");
+    }
 
-  if (emailCadastrado) {
-    fields.push("email");
-  }
+    if (emailCadastrado) {
+      fields.push("email");
+    }
 
-  if (fields.length > 0) {
-    throw new ConflictError("Usuário já cadastrado", {
-      fields,
+    if (fields.length > 0) {
+      throw new ConflictError("Usuário já cadastrado", {
+        fields,
+      });
+    }
+
+    const senhaCriptografada = await bcrypt.hash(usuarioDTO.senha, SALT_ROUNDS);
+
+    const usuario = await tx.usuario.create({
+      data: {
+        ...usuarioDTO,
+        senha: senhaCriptografada,
+      },
     });
-  }
 
-  const senhaCriptografada = await bcrypt.hash(usuarioDTO.senha, SALT_ROUNDS);
+    const usuarioSeguro = sanitizeUsuario(usuario);
 
-  const usuario = await db.usuario.create({
-    data: {
-      ...usuarioDTO,
-      senha: senhaCriptografada,
-    },
+    await criarLog(tx, {
+      id_usuario: usuarioResponsavelId,
+      tabela: "usuario",
+      id_tabela: usuario.id,
+      operacao: "INSERT",
+      depois: usuarioSeguro,
+    });
+
+    return usuarioSeguro;
   });
-
-  return sanitizeUsuario(usuario);
 };
 
 export default {
