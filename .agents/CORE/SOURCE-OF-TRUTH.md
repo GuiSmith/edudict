@@ -209,6 +209,51 @@ Falhas de persistência do log deverão ser registradas apenas com:
 
 `console.error`
 
+#### `log_app`
+
+Tabela responsável por registrar logs de alterações de dados feitas pela aplicação.
+
+O `log_app` não substitui o `log_api`.
+
+A separação esperada é:
+
+* `log_api`: registra contexto HTTP da requisição e resposta.
+* `log_app`: registra operações de aplicação sobre dados persistidos.
+
+O `log_app` não deve registrar contexto HTTP, como IP, user-agent, rota, método, status code, body da requisição ou body da resposta. Esses dados pertencem ao `log_api`.
+
+As operações permitidas em `log_app` são:
+
+* `INSERT`
+* `UPDATE`
+* `DELETE`
+* `LOGIN`
+* `LOGOUT`
+
+O DTO de criação de log deve ficar em:
+
+`src/dtos/log-app/criar-log.dto.js`
+
+O service responsável por persistir logs de aplicação deve ficar em:
+
+`src/services/log-app.service.js`
+
+A função principal do service deve se chamar:
+
+`criarLog`
+
+A função `criarLog` deve receber como primeiro parâmetro o client/conexão de banco que será utilizado para persistir o log, como `db` ou `tx`.
+
+Exemplo:
+
+`criarLog(tx, payload)`
+
+Quando a operação principal estiver dentro de uma transação, o `log_app` deve ser gravado usando o mesmo `tx`.
+
+Operações de escrita que gerem `log_app` devem começar a transação antes das leituras relevantes do fluxo, para garantir isolamento entre o dado lido, a alteração feita e o log gravado.
+
+Campos sensíveis conhecidos, como `password` e `senha`, devem ser removidos dos dados salvos em `antes` e `depois` usando a mesma estratégia de sanitização do `log_api`.
+
 #### `error.middleware.js`
 
 Middleware global responsável por centralizar o tratamento de erros da API.
@@ -285,6 +330,7 @@ O middleware global também deverá registrar erros inesperados com `console.err
 * Exemplos de estrutura:
   * `src/dtos/auth/login.dto.js`
   * `src/dtos/usuario/criar-usuario.dto.js`
+  * `src/dtos/log-app/criar-log.dto.js`
 * DTOs não deverão conter regra de negócio
 * DTOs deverão validar apenas estrutura e formato dos dados
 * DTOs poderão:
@@ -310,6 +356,7 @@ O middleware global também deverá registrar erros inesperados com `console.err
 * Use try catch apenas se for necessário usar rollback em algum momento
 * Exemplos de rotas abaixo
 * `services/auth.service.js`
+* `services/log-app.service.js`
 * `services/usuarios.service.js`
 * `services/produtos.service.js`
 * `services/estoque.service.js`

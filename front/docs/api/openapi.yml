@@ -17,7 +17,7 @@ paths:
       tags:
         - Auth
       summary: Login
-      description: Autentica o usuario por CPF ou e-mail e retorna o cookie de autenticacao.
+      description: Autentica o usuario por CPF ou e-mail, retorna o cookie de autenticacao e registra a tentativa no log da aplicacao.
       operationId: login
       requestBody:
         required: true
@@ -97,7 +97,7 @@ paths:
       tags:
         - Auth
       summary: Logout
-      description: Encerra a autenticacao no navegador removendo o cookie de autenticacao.
+      description: Encerra a autenticacao no navegador removendo o cookie de autenticacao e registra o logout no log da aplicacao.
       operationId: logout
       responses:
         "204":
@@ -126,7 +126,7 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       summary: Criar usuario
-      description: Cria um novo usuario e retorna os dados publicos do cadastro.
+      description: Cria um novo usuario, registra a criacao no log da aplicacao e retorna os dados publicos do cadastro.
       operationId: criarUsuario
       requestBody:
         required: true
