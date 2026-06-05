@@ -7,9 +7,91 @@ servers:
   - url: http://localhost:3000
     description: Ambiente local do back-end
 tags:
+  - name: Auth
+    description: Autenticacao de usuarios.
   - name: Usuarios
     description: Gerenciamento de usuarios.
 paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login
+      description: Autentica o usuario por CPF ou e-mail e retorna o cookie de autenticacao.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+            examples:
+              loginPorEmail:
+                summary: Login por e-mail
+                value:
+                  login: maria.silva@example.com
+                  password: senha-segura
+              loginPorCpf:
+                summary: Login por CPF
+                value:
+                  login: "123.456.789-01"
+                  password: senha-segura
+      responses:
+        "200":
+          description: Usuario autenticado.
+          headers:
+            Set-Cookie:
+              description: Cookie httpOnly de autenticacao com duracao de 8 horas.
+              schema:
+                type: string
+                example: token=abc123; Max-Age=28800; Path=/; HttpOnly; SameSite=Lax
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+              examples:
+                usuarioAutenticado:
+                  value:
+                    usuario:
+                      id: 1
+                      nome: Maria Silva
+                      cpf: "12345678901"
+                      email: maria.silva@example.com
+                      ativo: true
+        "400":
+          description: Campos obrigatorios ausentes ou dados invalidos.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                camposObrigatoriosAusentes:
+                  value:
+                    error: Campos obrigatórios ausentes
+                    details:
+                      fields:
+                        - login
+                        - password
+        "401":
+          description: Credenciais invalidas ou login ambiguo.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                naoAutorizado:
+                  value:
+                    error: Não autorizado
+        "500":
+          description: Erro inesperado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                erroInterno:
+                  value:
+                    error: Erro interno do servidor
   /usuarios:
     post:
       tags:
@@ -61,6 +143,18 @@ paths:
                       fields:
                         - nome
                         - cpf
+                cpfInvalido:
+                  value:
+                    error: CPF inválido
+                    details:
+                      fields:
+                        - cpf
+                emailInvalido:
+                  value:
+                    error: E-mail inválido
+                    details:
+                      fields:
+                        - email
         "409":
           description: Usuario ja cadastrado com o mesmo CPF ou e-mail.
           content:
@@ -87,6 +181,28 @@ paths:
                     error: Erro interno do servidor
 components:
   schemas:
+    LoginRequest:
+      type: object
+      additionalProperties: true
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+          description: CPF ou e-mail do usuario. Quando CPF, pode ser enviado formatado.
+          example: maria.silva@example.com
+        password:
+          type: string
+          format: password
+          example: senha-segura
+    LoginResponse:
+      type: object
+      required:
+        - usuario
+      properties:
+        usuario:
+          $ref: "#/components/schemas/Usuario"
     CriarUsuarioRequest:
       type: object
       additionalProperties: true
@@ -101,8 +217,10 @@ components:
           example: Maria Silva
         cpf:
           type: string
+          description: CPF pode ser enviado formatado, mas sera salvo apenas com numeros.
           minLength: 11
           maxLength: 11
+          pattern: "^\\d{11}$"
           example: "12345678901"
         email:
           type: string
