@@ -26,7 +26,7 @@ Se o usuário pediu o teste, assuma que está autorizado a:
 
 Crie os arquivos de teste dentro do diretório:
 
-`/testes`
+`/back/tests`
 
 Esse diretório fica na raiz do projeto `stocky`.
 
@@ -49,7 +49,7 @@ Não criar testes genéricos com nomes vagos.
 
 ## Logs obrigatórios
 
-Todo teste executado deve gerar um arquivo `.log` dentro de `/testes`.
+Todo teste executado deve gerar um arquivo `.log` dentro de `/back/tests`.
 
 O nome do log deve seguir o nome do teste ou da rota testada.
 

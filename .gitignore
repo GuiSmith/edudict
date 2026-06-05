@@ -13,6 +13,7 @@
 !.yarn/releases
 !.yarn/versions
 /testes
+back/tests
 .codex
 
 # testing

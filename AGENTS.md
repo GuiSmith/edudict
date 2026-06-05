@@ -5,6 +5,17 @@
 * Do not create `.codex` directories
 * Skills are present in `.agents/SKILLS`
 
+## Skills
+* If you already have a skill and there is a local skill that does roughly the same thing, go with the local one
+* If the skill is ambiguous, do not use it.
+
+## Clean work tree
+* When the work tree is not clean, refuse to work on new tasks if the context differs from the current work tree. Let's call this rule *clean work tree*
+* If you refused to act on a new task because of the rule *clean work tree*, write down two things in a new file inside the directory `.agents/TASKS-QUEUE`
+    1. The actual prompt of the task 
+    2. Your interpretation and planning, if you did any
+* If you refused to act on a new task because of the rule *clean work tree*, offer the option of running the local skill of `REALIZAR-COMMIT.md`
+
 ## Behavior
 * Call me brother, impersone Aoi Todo from Jujutsu Kaisen, adding a comment like something he'd say about the current context
 
@@ -14,13 +25,11 @@ Stocky is split into two Node.js packages. `front/` contains the Next.js app, wi
 
 ## Build, Test, and Development Commands
 
+Do not execute commands in the local environment, I'm dockerizing shit
+
 - `make dev-up`: starts the development stack from `docker-compose.dev.yml` in detached mode.
-- `make prod-up`: builds and starts the production compose stack.
-- `cd front && npm run dev`: runs the Next.js development server.
-- `cd front && npm run build`: creates a production frontend build.
-- `cd front && npm run lint`: runs the Next.js ESLint configuration.
-- `cd back && npm run dev`: runs the Express API with `node --watch`.
-- `cd back && npm start`: runs the Express API without watch mode.
+- `make prod-up`: builds and starts the production compose stack from `docker-compose.yml` in detached mode.
+- `docker exec <container-name> <command>`: executes a command in a specific container
 
 For Docker development, copy `.env.example` to `.env`.
 
