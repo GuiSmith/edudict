@@ -1,5 +1,9 @@
+import bcrypt from "bcrypt";
+
 import db from "../config/database.js";
 import ConflictError from "../errors/conflict.error.js";
+
+const SALT_ROUNDS = 10;
 
 const sanitizeUsuario = (usuario) => {
   const { senha, ...safeUsuario } = usuario;
@@ -54,8 +58,13 @@ const criarUsuario = async (usuarioDTO) => {
     });
   }
 
+  const senhaCriptografada = await bcrypt.hash(usuarioDTO.senha, SALT_ROUNDS);
+
   const usuario = await db.usuario.create({
-    data: usuarioDTO,
+    data: {
+      ...usuarioDTO,
+      senha: senhaCriptografada,
+    },
   });
 
   return sanitizeUsuario(usuario);
