@@ -96,6 +96,9 @@ paths:
     post:
       tags:
         - Usuarios
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
       summary: Criar usuario
       description: Cria um novo usuario e retorna os dados publicos do cadastro.
       operationId: criarUsuario
@@ -169,6 +172,16 @@ paths:
                       fields:
                         - cpf
                         - email
+        "401":
+          description: Autenticacao nao realizada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                autenticacaoNaoRealizada:
+                  value:
+                    error: Autenticação não realizada
         "500":
           description: Erro inesperado.
           content:
@@ -180,6 +193,16 @@ paths:
                   value:
                     error: Erro interno do servidor
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Token informado no header Authorization.
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: token
+      description: Token informado no cookie httpOnly `token`.
   schemas:
     LoginRequest:
       type: object
