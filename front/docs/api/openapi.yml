@@ -17,7 +17,7 @@ paths:
       tags:
         - Auth
       summary: Login
-      description: Autentica o usuario por CPF ou e-mail, retorna o cookie de autenticacao e registra a tentativa no log da aplicacao.
+      description: Autentica o usuario por CPF ou e-mail, cria o token de autenticacao, retorna o cookie e registra o token criado no log da aplicacao.
       operationId: login
       requestBody:
         required: true
@@ -97,7 +97,7 @@ paths:
       tags:
         - Auth
       summary: Logout
-      description: Encerra a autenticacao no navegador removendo o cookie de autenticacao e registra o logout no log da aplicacao.
+      description: Encerra a autenticacao no navegador, inativa o token utilizado, remove o cookie de autenticacao e registra a alteracao do token no log da aplicacao.
       operationId: logout
       responses:
         "204":

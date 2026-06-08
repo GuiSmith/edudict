@@ -33,14 +33,22 @@ const gerarToken = () => randomBytes(48).toString("hex");
 const criarToken = async (dbClient, usuarioId) => {
   const token = gerarToken();
 
-  await dbClient.token.create({
+  return dbClient.token.create({
     data: {
       token,
       id_usuario: usuarioId,
     },
   });
+};
 
-  return token;
+const formatarTokenParaLog = (token) => {
+  return {
+    id: token.id,
+    token: token.token,
+    id_usuario: token.id_usuario,
+    ativo: token.ativo,
+    criado_em: token.criado_em.toISOString(),
+  };
 };
 
 const login = async (loginDTO) => {
@@ -53,26 +61,22 @@ const login = async (loginDTO) => {
     ]);
 
     if (usuarioPorCpf && usuarioPorEmail) {
-      await registrarLoginNegado(tx, null, "login_ambiguo");
       return null;
     }
 
     if (!usuarioPorCpf && !usuarioPorEmail) {
-      await registrarLoginNegado(tx, null, "usuario_nao_encontrado");
       return null;
     }
 
     const usuario = usuarioPorCpf ?? usuarioPorEmail;
 
     if (!usuario.ativo) {
-      await registrarLoginNegado(tx, usuario, "usuario_inativo");
       return null;
     }
 
     const senhaValida = await bcrypt.compare(loginDTO.password, usuario.senha);
 
     if (!senhaValida) {
-      await registrarLoginNegado(tx, usuario, "senha_invalida");
       return null;
     }
 
@@ -81,17 +85,15 @@ const login = async (loginDTO) => {
 
     await criarLog(tx, {
       id_usuario: usuario.id,
-      tabela: "usuario",
-      id_tabela: usuario.id,
+      tabela: "token",
+      id_tabela: token.id,
       operacao: "LOGIN",
-      depois: {
-        sucesso: true,
-        usuario: usuarioSeguro,
-      },
+      antes: null,
+      depois: formatarTokenParaLog(token),
     });
 
     return {
-      token,
+      token: token.token,
       usuario: usuarioSeguro,
     };
   });
@@ -101,20 +103,6 @@ const login = async (loginDTO) => {
   }
 
   return autenticacao;
-};
-
-const registrarLoginNegado = (dbClient, usuario, motivo) => {
-  return criarLog(dbClient, {
-    id_usuario: null,
-    tabela: "usuario",
-    id_tabela: usuario?.id ?? null,
-    operacao: "LOGIN",
-    depois: {
-      sucesso: false,
-      motivo,
-      usuario: usuario ? sanitizeUsuario(usuario) : null,
-    },
-  });
 };
 
 const logout = async (token) => {
@@ -138,22 +126,28 @@ const logout = async (token) => {
         })
       : null;
 
+    if (!tokenEncontrado || !tokenEncontrado.ativo) {
+      return;
+    }
+
+    const tokenAntes = formatarTokenParaLog(tokenEncontrado);
+
+    const tokenAtualizado = await tx.token.update({
+      where: {
+        id: tokenEncontrado.id,
+      },
+      data: {
+        ativo: false,
+      },
+    });
+
     await criarLog(tx, {
       id_usuario: tokenEncontrado?.usuario?.id ?? null,
       tabela: "token",
       id_tabela: tokenEncontrado?.id ?? null,
       operacao: "LOGOUT",
-      antes: tokenEncontrado
-        ? {
-            id: tokenEncontrado.id,
-            id_usuario: tokenEncontrado.id_usuario,
-            ativo: tokenEncontrado.ativo,
-          }
-        : null,
-      depois: {
-        sucesso: Boolean(tokenEncontrado),
-        usuario: tokenEncontrado?.usuario ?? null,
-      },
+      antes: tokenAntes,
+      depois: formatarTokenParaLog(tokenAtualizado),
     });
   });
 };
