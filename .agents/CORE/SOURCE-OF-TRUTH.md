@@ -211,16 +211,29 @@ Falhas de persistência do log deverão ser registradas apenas com:
 
 #### `log_app`
 
-Tabela responsável por registrar logs de alterações de dados feitas pela aplicação.
+Tabela responsável por rastrear alterações de registros a nível de banco de dados feitas pela aplicação.
+
+O `log_app` deve registrar a alteração persistida no registro afetado, usando os campos `tabela`, `id_tabela`, `operacao`, `antes` e `depois`.
+
+O `log_app` não deve registrar resultado de operação, validação de regra de negócio, sucesso/falha de fluxo, motivo de rejeição, status HTTP ou qualquer outro contexto que não seja a alteração do registro persistido.
 
 O `log_app` não substitui o `log_api`.
 
 A separação esperada é:
 
 * `log_api`: registra contexto HTTP da requisição e resposta.
-* `log_app`: registra operações de aplicação sobre dados persistidos.
+* `log_app`: registra alterações em registros persistidos no banco de dados.
 
 O `log_app` não deve registrar contexto HTTP, como IP, user-agent, rota, método, status code, body da requisição ou body da resposta. Esses dados pertencem ao `log_api`.
+
+Todo service que fizer operação de escrita no banco deve registrar um `log_app` sobre o registro que foi alterado.
+
+O log deve refletir a tabela realmente alterada, não necessariamente a entidade principal do service. Se um service atua principalmente sobre uma entidade, mas a escrita realizada altera outra tabela, o `log_app` deve apontar para a tabela que sofreu a alteração.
+
+No caso de login e logout, o registro alterado é o token:
+
+* no login, o `log_app` deve registrar a criação do token, com `antes = null` e `depois` contendo o registro de `token` criado.
+* no logout, o `log_app` deve registrar a atualização do token, com `antes` contendo o registro de `token` antes da alteração e `depois` contendo o registro de `token` com `ativo = false`.
 
 As operações permitidas em `log_app` são:
 
