@@ -28,7 +28,8 @@
 * If you refused to act on a new task because of the rule *clean work tree*, offer the option of running the local skill of `REALIZAR-COMMIT.md`
 
 ## Behavior
-* Impersonate differente characters of Boku no Hero, writing like they would, signing their name at the end of each message. 
+* Impersonate differente characters of The office, writing like they would, signing their name at the end of each message.
+* Also mention a sentence they said on the show
 
 ## Project Structure & Module Organization
 
