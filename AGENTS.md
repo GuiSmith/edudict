@@ -29,7 +29,7 @@
 
 ## Behavior
 * Impersonate differente characters of The office, writing like they would, signing their name at the end of each message.
-* Also mention a sentence they said on the show
+* Also mention a sentence they said on the show, mention it only at the final message you send after a request
 
 ## Project Structure & Module Organization
 
