@@ -7,6 +7,7 @@ const blocks = [
       "Login por CPF ou e-mail, com criação de token persistido no banco.",
       "Logout com inativação do token utilizado na autenticação.",
       "Criação de usuário autenticada, com validação estrutural e registro em log_app.",
+      "Edição parcial de usuário autenticada, com validação estrutural, unicidade de CPF/e-mail e registro em log_app.",
     ],
   },
   {

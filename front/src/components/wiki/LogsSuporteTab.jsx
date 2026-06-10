@@ -16,7 +16,7 @@ const blocks = [
       "Registra alteração de registro persistido no banco.",
       "Não deve guardar sucesso, falha, motivo de rejeição, status HTTP ou contexto de requisição.",
       "No login e logout, a entidade auditada é token.",
-      "Na criação de usuário, a entidade auditada é usuario.",
+      "Na criação e edição de usuário, a entidade auditada é usuario.",
     ],
   },
   {
@@ -25,6 +25,7 @@ const blocks = [
       "Para investigar falha de login, comece pelo log_api, porque login inválido não altera banco.",
       "Para auditar criação ou inativação de token, consulte log_app filtrando tabela token.",
       "Para auditar criação de usuário, consulte log_app filtrando tabela usuario e operação INSERT.",
+      "Para auditar edição de usuário, consulte log_app filtrando tabela usuario e operação UPDATE.",
     ],
   },
 ];
@@ -33,7 +34,7 @@ export default function LogsSuporteTab() {
   return (
     <WikiTabContent
       blocks={blocks}
-      description="Login, logout e criação de usuário geram trilhas diferentes entre log_api e log_app."
+      description="Login, logout, criação de usuário e edição de usuário geram trilhas diferentes entre log_api e log_app."
       title="Logs e suporte técnico"
     />
   );

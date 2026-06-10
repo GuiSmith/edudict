@@ -14,6 +14,7 @@ import Head from "next/head";
 import { useMemo, useState } from "react";
 
 import CriarUsuarioTab from "@/components/wiki/CriarUsuarioTab";
+import EditarUsuarioTab from "@/components/wiki/EditarUsuarioTab";
 import FuncionalidadesPrevistasTab from "@/components/wiki/FuncionalidadesPrevistasTab";
 import LoginTab from "@/components/wiki/LoginTab";
 import LogoutTab from "@/components/wiki/LogoutTab";
@@ -104,6 +105,11 @@ const wikiTabs = [
     id: "criar-usuario",
     label: "Criar usuário",
     Component: CriarUsuarioTab,
+  },
+  {
+    id: "editar-usuario",
+    label: "Editar usuário",
+    Component: EditarUsuarioTab,
   },
   {
     id: "logs-suporte",

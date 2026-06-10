@@ -5,7 +5,8 @@ const blocks = [
     title: "Usuários",
     items: [
       "A fonte de verdade prevê listagem, edição, inativação, associação a almoxarifados e controle de permissões.",
-      "No código atual, o único endpoint de usuários implementado é a criação via POST /usuarios.",
+      "No código atual, os endpoints de usuários implementados são criação via POST /usuarios e edição via PUT /usuarios.",
+      "Listagem, inativação dedicada, associação a almoxarifados e controle de permissões ainda aparecem como previstos.",
     ],
   },
   {
