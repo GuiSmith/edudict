@@ -14,7 +14,7 @@ const blocks = [
     title: "Como ler esta wiki",
     items: [
       "As regras descritas aqui foram extraídas das rotas, controllers, DTOs, services, middlewares e OpenAPI existentes.",
-      "Quando uma funcionalidade aparece apenas como prevista na fonte de verdade, ela fica separada das funcionalidades prontas.",
+      "Quando uma funcionalidade aparece apenas como prevista na documentação central, ela fica separada das funcionalidades prontas.",
       "O log_app é tratado como auditoria de alteração de registros do banco, enquanto o log_api registra contexto HTTP e resultado de requisições.",
     ],
   },

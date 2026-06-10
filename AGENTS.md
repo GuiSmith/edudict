@@ -5,15 +5,6 @@
 * Do not create `.codex` directories
 * Skills are present in `.agents/SKILLS`
 
-## `.agents` structure
-* `AGENTS.md` is hierarchy 1 and defines the repository-level instructions.
-* `.agents/SKILLS` stores local skills. Prefer local skills over equivalent non-local skills.
-* `.agents/CORE` is hierarchy 2. Read the files in this directory for every task passed to you.
-* `.agents/TASKS` stores tasks passed to you.
-* `.agents/TASKS/QUEUE` stores tasks that are not done yet.
-* `.agents/TASKS/LOG` stores tasks that are already done. Do not read `LOG` unless the user asks.
-* Every time a task from `QUEUE` is executed, ask whether you may commit and whether you may move the task to `LOG`.
-
 ## Skills
 * If you already have a skill and there is a local skill that does roughly the same thing, go with the local one
 * If the skill is ambiguous, do not use it.
@@ -33,7 +24,37 @@
 
 ## Project Structure & Module Organization
 
-Stocky is split into two Node.js packages. `front/` contains the Next.js app, with pages in `front/src/pages/`, CSS in `front/src/styles/`, and static assets in `front/public/`. `back/` contains the Express API entry point at `back/server.js`, Prisma schema at `back/prisma/schema.prisma`, and database helpers/migrations under `back/src/database/`. Root `docker-compose*.yml` files define containers, and the `Makefile` wraps compose commands. `testes/` exists for future test assets, but no automated tests are wired yet.
+### `.agents`
+* `AGENTS.md` is hierarchy 1 and defines the repository-level instructions.
+* `.agents/SKILLS` stores local skills. Prefer local skills over equivalent non-local skills.
+* `.agents/CORE` is hierarchy 2 and stores the central project documentation split by purpose.
+* `.agents/TASKS` stores tasks passed to you.
+* `.agents/TASKS/QUEUE` stores tasks that are not done yet.
+* `.agents/TASKS/LOG` stores tasks that are already done. Do not read `LOG` unless the user asks.
+* Every time a task from `QUEUE` is executed, ask whether you may commit and whether you may move the task to `LOG`.
+
+### `back`
+
+* Contains the source code of the back-end part of the project
+
+### `front`
+
+* Contains the source code of the front-end part of the project
+
+### `infra`
+
+* Contains the files necessary to setup the project's environment
+* `docker-compose.yml`: orchestrates the production environment containers
+* `docker-compose.dev.yml`: orchestrates the production environment containers
+* `.env.example`: contians the template of the necessary variables to setup the environment
+* `.env`: contains the actual environment variables, shouldn't be read nor commited
+
+### root
+
+* `.gitignore`
+* `.AGENTS.md`: guideline for codex or other AI agents
+* `Makefile`: useful commands
+* `README.md`: guideline for setting up the environment 
 
 ## Build, Test, and Development Commands
 
@@ -61,11 +82,14 @@ The history only shows `First commit`, so no strict convention is established. U
 
 Do not commit or alter `.env` files, secrets, database dumps, or generated dependency folders. Also do not alter docker-compose and Dockerfile files. Anything related to the infrastructure in general.
 
-## Source of Truth
-* Alawyas check and follow the source of truth before implementing something that was asked
-* If a request goes against the source of truth, do not change anything and bring up the conflict
-* The source of truth is your guide and anything that isn't coding and that isn't defined in there shouldn't be assumed, so it must be asked
-* The source of truth is in `.agents/CORE/SOURCE-OF-TRUTH.md`
+## Central documentation
+* Always check and follow the relevant central documentation before implementing something that was asked.
+* If a request goes against the relevant central documentation, do not change anything and bring up the conflict.
+* The central documentation is your guide. Anything that is not coding and is not defined there should not be assumed; ask instead.
+* Read `.agents/CORE/PROJECT-CONTEXT.md` when the task involves academic context, deadlines, deliverables, evaluation criteria or teacher expectations.
+* Read `.agents/CORE/APPLICATION-SCOPE.md` when the task involves product scope, modules, business rules, entities, inventory flow, dashboard, permissions, integrations or features.
+* Read `.agents/CORE/SOFTWARE-ARCHITECTURE.md` when the task involves implementation, architecture, layers, DTOs, services, controllers, repositories, middlewares, logs, errors, authentication, transactions or design patterns.
+* Read `README.md` when the task involves installation, local execution, Docker, migrations, Prisma or operational infrastructure.
 
 ## Back-end
 * After alterations on the API, the API should be documented in `front/docs/api/openapi.yml`
