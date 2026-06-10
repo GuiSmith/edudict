@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 
 import db from "../config/database.js";
 import ConflictError from "../errors/conflict.error.js";
+import NotFoundError from "../errors/not-found.error.js";
 import { criarLog } from "./log-app.service.js";
 
 const SALT_ROUNDS = 10;
@@ -35,6 +36,64 @@ const emailJaCadastrado = async (dbClient, email) => {
   });
 
   return Boolean(usuario);
+};
+
+const cpfCadastradoEmOutroUsuario = async (dbClient, cpf, usuarioId) => {
+  const usuario = await dbClient.usuario.findFirst({
+    where: {
+      cpf,
+      NOT: {
+        id: usuarioId,
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return Boolean(usuario);
+};
+
+const emailCadastradoEmOutroUsuario = async (dbClient, email, usuarioId) => {
+  const usuario = await dbClient.usuario.findFirst({
+    where: {
+      email,
+      NOT: {
+        id: usuarioId,
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return Boolean(usuario);
+};
+
+const montarPayloadAtualizacao = async (usuarioDTO) => {
+  const data = {};
+
+  if (Object.prototype.hasOwnProperty.call(usuarioDTO, "nome")) {
+    data.nome = usuarioDTO.nome;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(usuarioDTO, "cpf")) {
+    data.cpf = usuarioDTO.cpf;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(usuarioDTO, "email")) {
+    data.email = usuarioDTO.email;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(usuarioDTO, "senha")) {
+    data.senha = await bcrypt.hash(usuarioDTO.senha, SALT_ROUNDS);
+  }
+
+  if (Object.prototype.hasOwnProperty.call(usuarioDTO, "ativo")) {
+    data.ativo = usuarioDTO.ativo;
+  }
+
+  return data;
 };
 
 const criarUsuario = async (usuarioDTO, usuarioResponsavelId = null) => {
@@ -83,6 +142,68 @@ const criarUsuario = async (usuarioDTO, usuarioResponsavelId = null) => {
   });
 };
 
+const editarUsuario = async (usuarioDTO, usuarioResponsavelId = null) => {
+  return db.$transaction(async (tx) => {
+    const usuarioAtual = await tx.usuario.findUnique({
+      where: {
+        id: usuarioDTO.id,
+      },
+    });
+
+    if (!usuarioAtual) {
+      throw new NotFoundError("Usuário não encontrado", {
+        fields: ["id"],
+      });
+    }
+
+    const fields = [];
+
+    if (
+      Object.prototype.hasOwnProperty.call(usuarioDTO, "cpf") &&
+      await cpfCadastradoEmOutroUsuario(tx, usuarioDTO.cpf, usuarioDTO.id)
+    ) {
+      fields.push("cpf");
+    }
+
+    if (
+      Object.prototype.hasOwnProperty.call(usuarioDTO, "email") &&
+      await emailCadastradoEmOutroUsuario(tx, usuarioDTO.email, usuarioDTO.id)
+    ) {
+      fields.push("email");
+    }
+
+    if (fields.length > 0) {
+      throw new ConflictError("Usuário já cadastrado", {
+        fields,
+      });
+    }
+
+    const data = await montarPayloadAtualizacao(usuarioDTO);
+
+    const usuarioAtualizado = await tx.usuario.update({
+      where: {
+        id: usuarioDTO.id,
+      },
+      data,
+    });
+
+    const usuarioAtualSeguro = sanitizeUsuario(usuarioAtual);
+    const usuarioAtualizadoSeguro = sanitizeUsuario(usuarioAtualizado);
+
+    await criarLog(tx, {
+      id_usuario: usuarioResponsavelId,
+      tabela: "usuario",
+      id_tabela: usuarioDTO.id,
+      operacao: "UPDATE",
+      antes: usuarioAtualSeguro,
+      depois: usuarioAtualizadoSeguro,
+    });
+
+    return usuarioAtualizadoSeguro;
+  });
+};
+
 export default {
   criarUsuario,
+  editarUsuario,
 };

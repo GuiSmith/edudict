@@ -1,11 +1,16 @@
 import BadRequestError from "../../errors/bad-request.error.js";
-import { normalizarCpf } from "../../utils/cpf.js";
+import { cpfTemOnzeDigitos, normalizarCpf } from "../../utils/cpf.js";
+import { emailValido, normalizarEmail } from "../../utils/email.js";
+import {
+  nomeUsuarioValido,
+  normalizarNomeUsuario,
+  senhaUsuarioValida,
+} from "../../utils/usuario.js";
 
 const requiredFields = ["nome", "cpf", "email", "senha"];
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const validarCpf = (cpf) => {
-  if (cpf.length !== 11) {
+  if (!cpfTemOnzeDigitos(cpf)) {
     throw new BadRequestError("CPF inválido", {
       fields: ["cpf"],
     });
@@ -13,9 +18,25 @@ const validarCpf = (cpf) => {
 };
 
 const validarEmail = (email) => {
-  if (!emailRegex.test(email)) {
+  if (!emailValido(email)) {
     throw new BadRequestError("E-mail inválido", {
       fields: ["email"],
+    });
+  }
+};
+
+const validarNome = (nome) => {
+  if (!nomeUsuarioValido(nome)) {
+    throw new BadRequestError("Nome inválido", {
+      fields: ["nome"],
+    });
+  }
+};
+
+const validarSenha = (senha) => {
+  if (!senhaUsuarioValida(senha)) {
+    throw new BadRequestError("Senha inválida", {
+      fields: ["senha"],
     });
   }
 };
@@ -29,14 +50,17 @@ const criarUsuarioDTO = (payload = {}) => {
     });
   }
 
+  const nome = normalizarNomeUsuario(payload.nome);
   const cpf = normalizarCpf(payload.cpf);
-  const email = String(payload.email).trim();
+  const email = normalizarEmail(payload.email);
 
+  validarNome(payload.nome);
   validarCpf(cpf);
   validarEmail(email);
+  validarSenha(payload.senha);
 
   return {
-    nome: payload.nome,
+    nome,
     cpf,
     email,
     senha: payload.senha,

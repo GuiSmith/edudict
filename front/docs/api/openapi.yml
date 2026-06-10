@@ -218,6 +218,125 @@ paths:
                 erroInterno:
                   value:
                     error: Erro interno do servidor
+    put:
+      tags:
+        - Usuarios
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      summary: Editar usuario
+      description: Atualiza parcialmente um usuario existente, registra a alteracao no log da aplicacao e retorna os dados publicos atualizados sem senha.
+      operationId: editarUsuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditarUsuarioRequest"
+            examples:
+              editarNome:
+                summary: Editar nome
+                value:
+                  id: 1
+                  nome: Maria Souza
+              inativarUsuario:
+                summary: Inativar usuario
+                value:
+                  id: 1
+                  ativo: false
+      responses:
+        "200":
+          description: Usuario atualizado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EditarUsuarioResponse"
+              examples:
+                usuarioAtualizado:
+                  value:
+                    mensagem: Usuário atualizado com sucesso
+                    usuario:
+                      id: 1
+                      nome: Maria Souza
+                      cpf: "12345678901"
+                      email: maria.silva@example.com
+                      ativo: false
+        "400":
+          description: Dados invalidos ou nenhum campo de atualizacao enviado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                idAusente:
+                  value:
+                    error: Campos obrigatórios ausentes
+                    details:
+                      fields:
+                        - id
+                ativoInvalido:
+                  value:
+                    error: Ativo inválido
+                    details:
+                      fields:
+                        - ativo
+                semAlteracao:
+                  value:
+                    error: Informe ao menos um campo para atualização
+                    details:
+                      fields:
+                        - nome
+                        - cpf
+                        - email
+                        - senha
+                        - ativo
+        "401":
+          description: Autenticacao nao realizada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                autenticacaoNaoRealizada:
+                  value:
+                    error: Autenticação não realizada
+        "404":
+          description: Usuario nao encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                usuarioNaoEncontrado:
+                  value:
+                    error: Usuário não encontrado
+                    details:
+                      fields:
+                        - id
+        "409":
+          description: CPF ou e-mail ja cadastrado para outro usuario.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                usuarioJaCadastrado:
+                  value:
+                    error: Usuário já cadastrado
+                    details:
+                      fields:
+                        - cpf
+                        - email
+        "500":
+          description: Erro inesperado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                erroInterno:
+                  value:
+                    error: Erro interno do servidor
 components:
   securitySchemes:
     bearerAuth:
@@ -283,6 +402,53 @@ components:
           type: boolean
           default: true
           example: true
+    EditarUsuarioRequest:
+      type: object
+      additionalProperties: true
+      description: >
+        O campo id é obrigatório. Envie ao menos um dos campos editáveis
+        opcionais: nome, cpf, email, senha ou ativo.
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          minimum: 1
+          example: 1
+        nome:
+          type: string
+          description: Nome sem espacos nas extremidades e nao vazio.
+          example: Maria Souza
+        cpf:
+          type: string
+          description: CPF pode ser enviado formatado, mas sera salvo apenas com numeros.
+          minLength: 11
+          maxLength: 11
+          pattern: "^\\d{11}$"
+          example: "12345678901"
+        email:
+          type: string
+          format: email
+          example: maria.souza@example.com
+        senha:
+          type: string
+          format: password
+          description: Sera criptografada antes de persistir.
+          example: nova-senha-segura
+        ativo:
+          type: boolean
+          example: false
+    EditarUsuarioResponse:
+      type: object
+      required:
+        - mensagem
+        - usuario
+      properties:
+        mensagem:
+          type: string
+          example: Usuário atualizado com sucesso
+        usuario:
+          $ref: "#/components/schemas/Usuario"
     Usuario:
       type: object
       required:
