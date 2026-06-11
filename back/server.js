@@ -15,6 +15,7 @@ const port = 3000;
 
 app.use(express.json());
 app.use(logMiddleware);
+app.use(authMiddleware);
 
 app.get("/health", (req, res) => {
   res.status(200).json({
@@ -22,11 +23,7 @@ app.get("/health", (req, res) => {
     service: "stocky-backend",
   });
 });
-
-app.use("/auth", authRoutes);
-app.use(authMiddleware);
 app.use(await loadRoutes());
-
 app.use((req, res) => {
   throw new NotFoundError("Rota não encontrada", {
     path: req.originalUrl,

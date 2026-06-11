@@ -2,6 +2,11 @@ import db from "../config/database.js";
 
 const AUTH_FAILURE_MESSAGE = "Autenticação não realizada";
 const TOKEN_MAX_AGE_IN_MS = 8 * 60 * 60 * 1000;
+const PUBLIC_ROUTES = [
+  { method: 'GET', path: '/health' },
+  { method: 'POST', path: '/auth/login' },
+  { method: 'POST', path: '/auth/logout' },
+]
 
 const unauthorized = (res) => {
   return res.status(401).json({
@@ -52,9 +57,17 @@ const tokenExpirado = (token) => {
   return Date.now() - token.criado_em.getTime() > TOKEN_MAX_AGE_IN_MS;
 };
 
+const isPublicRoute = (req) => {
+  return Boolean(PUBLIC_ROUTES.find(route => route.method === req.method && route.path === req.path));
+}
+
 const authMiddleware = async (req, res, next) => {
   try {
     const requestToken = getRequestToken(req);
+
+    if(isPublicRoute(req)){
+      return next();
+    }
 
     if (!requestToken) {
       console.log("token não informado");

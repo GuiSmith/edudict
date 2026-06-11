@@ -71,6 +71,10 @@ const login = async (req, res) => {
   });
 };
 
+const verificarAutenticacao = async (req, res) => {
+  return res.status(200).json(req.user);
+};
+
 const logout = async (req, res) => {
   await authService.logout(getRequestToken(req));
 
@@ -81,5 +85,6 @@ const logout = async (req, res) => {
 
 export default {
   login,
+  verificarAutenticacao,
   logout,
 };
