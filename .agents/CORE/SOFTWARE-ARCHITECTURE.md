@@ -28,6 +28,17 @@ O back-end é responsável por:
 * useEffect: evite criar loop de dependências
 * Não será usado SSR
 * Evite criar variáveis booleanas intermediárias (canEdit, canDelete, canSave, etc.) quando elas forem utilizadas apenas uma única vez no JSX. Nestes casos, prefira utilizar a condição diretamente na propriedade ou renderização correspondente. Extraia para uma variável apenas quando a regra possuir complexidade relevante, for reutilizada em múltiplos locais ou melhorar significativamente a legibilidade.
+* Ao realizar importações do MUI material, siga a seguinte diretriz:
+  - NÃO FAZER:
+  ``` js
+  import { Box, Button, Stack } from '@mui/material';
+  ```
+  - FAZER:
+  ``` js
+  import Box from '@mui/material/Box';
+  import Button from '@mui/material/Button';
+  import Stack from '@mui/material/Stack';
+  ```
 
 ### Contexts
 
