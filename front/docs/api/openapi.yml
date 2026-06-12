@@ -13,7 +13,7 @@ tags:
     description: Gerenciamento de usuarios.
 paths:
   /auth/me:
-    post:
+    get:
       tags:
         - Auth
       security:
