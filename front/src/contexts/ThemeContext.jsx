@@ -110,8 +110,48 @@ export function AppThemeProvider({ children }) {
         },
         typography: {
           fontFamily: "Arial, Helvetica, sans-serif",
+          h1: {
+            fontSize: "2rem",
+            fontWeight: 700,
+            lineHeight: 1.2,
+            letterSpacing: 0,
+          },
+          h2: {
+            fontSize: "1.55rem",
+            fontWeight: 700,
+            lineHeight: 1.25,
+            letterSpacing: 0,
+          },
+          h3: {
+            fontSize: "1.08rem",
+            fontWeight: 700,
+            lineHeight: 1.35,
+            letterSpacing: 0,
+          },
+          body1: {
+            lineHeight: 1.7,
+            letterSpacing: 0,
+          },
+          body2: {
+            lineHeight: 1.65,
+            letterSpacing: 0,
+          },
           allVariants: {
             letterSpacing: 0,
+          },
+        },
+        components: {
+          MuiTab: {
+            styleOverrides: {
+              root: {
+                alignItems: "flex-start",
+                borderRadius: 6,
+                fontWeight: 700,
+                letterSpacing: 0,
+                minHeight: 42,
+                textTransform: "none",
+              },
+            },
           },
         },
       }),

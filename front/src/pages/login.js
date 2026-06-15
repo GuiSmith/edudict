@@ -60,7 +60,7 @@ export default function LoginPage() {
         component="main"
         sx={{
           alignItems: "center",
-          bgcolor: "#f4f7fb",
+          bgcolor: "background.default",
           display: "flex",
           minHeight: "100vh",
           px: 2,
@@ -72,9 +72,14 @@ export default function LoginPage() {
           elevation={0}
           onSubmit={handleSubmit}
           sx={{
-            border: "1px solid #d8e0ea",
+            bgcolor: "background.paper",
+            border: "1px solid",
+            borderColor: "divider",
             borderRadius: 2,
-            boxShadow: "0 18px 50px rgba(21, 32, 51, 0.08)",
+            boxShadow: (theme) =>
+              theme.palette.mode === "light"
+                ? "0 18px 50px rgba(21, 32, 51, 0.08)"
+                : "0 18px 50px rgba(0, 0, 0, 0.28)",
             mx: "auto",
             p: { xs: 3, sm: 4 },
             width: "min(420px, 100%)",

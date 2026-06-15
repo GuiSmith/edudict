@@ -1,15 +1,10 @@
-import {
-  Box,
-  Chip,
-  CssBaseline,
-  Paper,
-  Stack,
-  Tab,
-  Tabs,
-  ThemeProvider,
-  Typography,
-  createTheme,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import Typography from "@mui/material/Typography";
 import Head from "next/head";
 import { useMemo, useState } from "react";
 
@@ -20,70 +15,6 @@ import LoginTab from "@/components/wiki/LoginTab";
 import LogoutTab from "@/components/wiki/LogoutTab";
 import LogsSuporteTab from "@/components/wiki/LogsSuporteTab";
 import VisaoGeralTab from "@/components/wiki/VisaoGeralTab";
-
-const theme = createTheme({
-  palette: {
-    mode: "light",
-    primary: {
-      main: "#2f6f73",
-      dark: "#174447",
-    },
-    background: {
-      default: "#f4f7fb",
-      paper: "#ffffff",
-    },
-    text: {
-      primary: "#152033",
-      secondary: "#536176",
-    },
-  },
-  shape: {
-    borderRadius: 8,
-  },
-  typography: {
-    fontFamily: "Arial, Helvetica, sans-serif",
-    h1: {
-      fontSize: "2rem",
-      fontWeight: 700,
-      lineHeight: 1.2,
-      letterSpacing: 0,
-    },
-    h2: {
-      fontSize: "1.55rem",
-      fontWeight: 700,
-      lineHeight: 1.25,
-      letterSpacing: 0,
-    },
-    h3: {
-      fontSize: "1.08rem",
-      fontWeight: 700,
-      lineHeight: 1.35,
-      letterSpacing: 0,
-    },
-    body1: {
-      lineHeight: 1.7,
-      letterSpacing: 0,
-    },
-    body2: {
-      lineHeight: 1.65,
-      letterSpacing: 0,
-    },
-  },
-  components: {
-    MuiTab: {
-      styleOverrides: {
-        root: {
-          alignItems: "flex-start",
-          borderRadius: 6,
-          fontWeight: 700,
-          letterSpacing: 0,
-          minHeight: 42,
-          textTransform: "none",
-        },
-      },
-    },
-  },
-});
 
 const wikiTabs = [
   {
@@ -131,8 +62,7 @@ export default function WikiPage() {
   );
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <>
       <Head>
         <title>edudict Wiki do Sistema</title>
         <meta name="description" content="Wiki funcional do sistema edudict" />
@@ -152,8 +82,11 @@ export default function WikiPage() {
           elevation={0}
           sx={{
             border: "1px solid",
-            borderColor: "#d8e0ea",
-            boxShadow: "0 18px 50px rgba(21, 32, 51, 0.08)",
+            borderColor: "divider",
+            boxShadow: (theme) =>
+              theme.palette.mode === "light"
+                ? "0 18px 50px rgba(21, 32, 51, 0.08)"
+                : "0 18px 50px rgba(0, 0, 0, 0.28)",
             mx: "auto",
             overflow: "hidden",
             width: "min(1180px, 100%)",
@@ -163,7 +96,7 @@ export default function WikiPage() {
             component="header"
             sx={{
               borderBottom: "1px solid",
-              borderColor: "#d8e0ea",
+              borderColor: "divider",
               p: { xs: 2.5, md: 4 },
             }}
           >
@@ -201,9 +134,11 @@ export default function WikiPage() {
             <Box
               component="nav"
               sx={{
-                bgcolor: "#f8fafc",
-                borderBottom: { xs: "1px solid #d8e0ea", md: 0 },
-                borderRight: { xs: 0, md: "1px solid #d8e0ea" },
+                bgcolor: "action.hover",
+                borderBottom: { xs: "1px solid", md: 0 },
+                borderBottomColor: "divider",
+                borderRight: { xs: 0, md: "1px solid" },
+                borderRightColor: "divider",
                 p: 2,
               }}
             >
@@ -231,13 +166,13 @@ export default function WikiPage() {
                       px: 1.5,
                       py: 1.25,
                       "&.Mui-selected": {
-                        bgcolor: "#e8f3f2",
+                        bgcolor: "action.selected",
                         borderColor: "primary.main",
-                        color: "primary.dark",
+                        color: "primary.main",
                       },
                       "&:hover": {
-                        bgcolor: "#ffffff",
-                        borderColor: "#c8d6e6",
+                        bgcolor: "background.paper",
+                        borderColor: "divider",
                       },
                     }}
                   />
@@ -254,6 +189,6 @@ export default function WikiPage() {
           </Box>
         </Paper>
       </Box>
-    </ThemeProvider>
+    </>
   );
 }
