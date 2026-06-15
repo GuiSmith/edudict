@@ -63,6 +63,7 @@ Do not execute commands in the local environment, I'm dockerizing shit
 - `make dev-up`: starts the development stack from `docker-compose.dev.yml` in detached mode.
 - `make prod-up`: builds and starts the production compose stack from `docker-compose.yml` in detached mode.
 - `docker exec <container-name> <command>`: executes a command in a specific container
+- DO NOT BUILD A CONTAINER EVER
 
 For Docker development, copy `.env.example` to `.env`.
 
