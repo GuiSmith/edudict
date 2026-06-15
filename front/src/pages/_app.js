@@ -4,6 +4,7 @@ import "@scalar/api-reference-react/style.css";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
+import NavbarLayout from "@/components/Navbar";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { AppThemeProvider } from "@/contexts/ThemeContext";
 
@@ -51,12 +52,18 @@ function RouteGuard({ children }) {
   return children;
 }
 
+function AppLayout({ children }) {
+  return <NavbarLayout>{children}</NavbarLayout>;
+}
+
 export default function App({ Component, pageProps }) {
   return (
     <AppThemeProvider>
       <AuthProvider>
         <RouteGuard>
-          <Component {...pageProps} />
+          <AppLayout>
+            <Component {...pageProps} />
+          </AppLayout>
         </RouteGuard>
       </AuthProvider>
     </AppThemeProvider>
