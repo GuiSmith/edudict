@@ -1,8 +1,9 @@
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
 
 const THEME_STORAGE_KEY = "edudict-theme-mode";
+const THEME_MODE_CHANGE_EVENT = "edudict-theme-mode-change";
 const ThemeContext = createContext(null);
 
 const getSystemThemeMode = () => {
@@ -31,18 +32,47 @@ const getStoredThemeMode = () => {
   return null;
 };
 
+const getThemeModeSnapshot = () => {
+  return getStoredThemeMode() || getSystemThemeMode();
+};
+
+const getServerThemeModeSnapshot = () => {
+  return "light";
+};
+
+const subscribeThemeMode = (onStoreChange) => {
+  if (typeof window === "undefined") {
+    return () => {};
+  }
+
+  const mediaQuery = window.matchMedia?.("(prefers-color-scheme: dark)");
+
+  window.addEventListener("storage", onStoreChange);
+  window.addEventListener(THEME_MODE_CHANGE_EVENT, onStoreChange);
+  mediaQuery?.addEventListener("change", onStoreChange);
+
+  return () => {
+    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener(THEME_MODE_CHANGE_EVENT, onStoreChange);
+    mediaQuery?.removeEventListener("change", onStoreChange);
+  };
+};
+
 export function AppThemeProvider({ children }) {
-  const [mode, setMode] = useState(() => getStoredThemeMode() || getSystemThemeMode());
+  const mode = useSyncExternalStore(
+    subscribeThemeMode,
+    getThemeModeSnapshot,
+    getServerThemeModeSnapshot
+  );
 
   const setThemeMode = useCallback((nextMode) => {
     if (nextMode !== "light" && nextMode !== "dark") {
       return;
     }
 
-    setMode(nextMode);
-
     if (typeof window !== "undefined") {
       window.localStorage.setItem(THEME_STORAGE_KEY, nextMode);
+      window.dispatchEvent(new Event(THEME_MODE_CHANGE_EVENT));
     }
   }, []);
 

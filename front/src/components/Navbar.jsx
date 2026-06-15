@@ -22,7 +22,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useThemeContext } from "@/contexts/ThemeContext";
@@ -30,6 +30,7 @@ import { useThemeContext } from "@/contexts/ThemeContext";
 const NAVBAR_EXPANDED_WIDTH = 248;
 const NAVBAR_COLLAPSED_WIDTH = 72;
 const NAVBAR_COLLAPSED_STORAGE_KEY = "edudict-navbar-collapsed";
+const NAVBAR_COLLAPSED_CHANGE_EVENT = "edudict-navbar-collapsed-change";
 
 const navItems = [
   {
@@ -77,6 +78,20 @@ const getInitialCollapsedState = () => {
   }
 
   return window.localStorage.getItem(NAVBAR_COLLAPSED_STORAGE_KEY) === "true";
+};
+
+const subscribeCollapsedState = (onStoreChange) => {
+  if (typeof window === "undefined") {
+    return () => {};
+  }
+
+  window.addEventListener("storage", onStoreChange);
+  window.addEventListener(NAVBAR_COLLAPSED_CHANGE_EVENT, onStoreChange);
+
+  return () => {
+    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener(NAVBAR_COLLAPSED_CHANGE_EVENT, onStoreChange);
+  };
 };
 
 const getVisibleItems = (items, estaAutenticado) => {
@@ -235,20 +250,23 @@ function NavbarContent({ collapsed, mobile, onClose, onToggleCollapse }) {
 export default function NavbarLayout({ children }) {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down("md"));
-  const [collapsed, setCollapsed] = useState(getInitialCollapsedState);
+  const collapsed = useSyncExternalStore(
+    subscribeCollapsedState,
+    getInitialCollapsedState,
+    () => false
+  );
   const [mobileOpen, setMobileOpen] = useState(false);
   const desktopWidth = collapsed ? NAVBAR_COLLAPSED_WIDTH : NAVBAR_EXPANDED_WIDTH;
 
   const toggleDesktopCollapse = () => {
     const nextCollapsed = !collapsed;
 
-    setCollapsed(nextCollapsed);
-
     if (typeof window !== "undefined") {
       window.localStorage.setItem(
         NAVBAR_COLLAPSED_STORAGE_KEY,
         String(nextCollapsed)
       );
+      window.dispatchEvent(new Event(NAVBAR_COLLAPSED_CHANGE_EVENT));
     }
   };
 
