@@ -35,6 +35,13 @@ const NAVBAR_COLLAPSED_CHANGE_EVENT = "edudict-navbar-collapsed-change";
 
 const navItems = [
   {
+    href: "/perfil",
+    icon: PersonIcon,
+    label: "Perfil",
+    type: "private",
+    usesAvatar: true,
+  },
+  {
     href: "/",
     icon: HomeIcon,
     label: "Início",
@@ -63,13 +70,6 @@ const navItems = [
     icon: PersonAddIcon,
     label: "Criar conta",
     type: "guest",
-  },
-  {
-    href: "/perfil",
-    icon: PersonIcon,
-    label: "Perfil",
-    type: "private",
-    usesAvatar: true,
   },
   {
     href: "/logout",
@@ -201,7 +201,7 @@ function NavbarContent({ collapsed, mobile, onClose, onToggleCollapse }) {
       >
         {collapsed && !mobile ? null : (
           <Typography component="span" fontWeight={700} variant="subtitle1">
-            edudict
+            EduDict
           </Typography>
         )}
         <Tooltip title={mobile ? "Fechar menu" : "Alternar menu"}>
