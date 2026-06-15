@@ -6,6 +6,7 @@ const PUBLIC_ROUTES = [
   { method: 'GET', path: '/health' },
   { method: 'POST', path: '/auth/login' },
   { method: 'POST', path: '/auth/logout' },
+  { method: 'POST', path: '/usuarios' },
 ]
 
 const unauthorized = (res) => {
