@@ -3,6 +3,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import HomeIcon from "@mui/icons-material/Home";
 import LoginIcon from "@mui/icons-material/Login";
+import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import PersonIcon from "@mui/icons-material/Person";
 import WbSunnyIcon from "@mui/icons-material/WbSunny";
@@ -61,6 +62,12 @@ const navItems = [
     label: "Perfil",
     type: "private",
     usesAvatar: true,
+  },
+  {
+    href: "/logout",
+    icon: LogoutIcon,
+    label: "Sair",
+    type: "private",
   },
 ];
 
