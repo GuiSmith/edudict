@@ -32,6 +32,7 @@
 * `.agents/TASKS/QUEUE` stores tasks that are not done yet.
 * `.agents/TASKS/LOG` stores tasks that are already done. Do not read `LOG` unless the user asks.
 * Every time a task from `QUEUE` is executed, ask whether you may commit and whether you may move the task to `LOG`.
+* Every time you commit a task from `QUEUE`, move the task to `LOG` before doing the actual commit, the moving the task will be part of the commit.
 
 ### `back`
 
