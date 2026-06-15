@@ -1,4 +1,3 @@
-import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
@@ -9,9 +8,11 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 import { useAuth } from "@/contexts/AuthContext";
 import authAxios from "@/utils/authAxios";
+import getApiErrorMessage from "@/utils/getApiErrorMessage";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,7 +21,6 @@ export default function LoginPage() {
     login: "",
     password: "",
   });
-  const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (event) => {
@@ -32,7 +32,6 @@ export default function LoginPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setErrorMessage("");
     setIsSubmitting(true);
 
     try {
@@ -43,7 +42,7 @@ export default function LoginPage() {
         router.replace("/");
       }
     } catch (error) {
-      setErrorMessage(error.response?.data?.error || "Nao foi possivel entrar");
+      toast.error(getApiErrorMessage(error));
     } finally {
       setIsSubmitting(false);
     }
@@ -95,9 +94,6 @@ export default function LoginPage() {
                 Use seu e-mail ou CPF para acessar o sistema.
               </Typography>
             </Stack>
-
-            {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
-
             <TextField
               autoComplete="username"
               disabled={isSubmitting || isAuthLoading}
