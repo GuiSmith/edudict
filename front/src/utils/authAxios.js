@@ -11,7 +11,8 @@ authAxios.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       typeof window !== "undefined" &&
-      window.location.pathname !== "/login"
+      window.location.pathname !== "/login" &&
+      window.location.pathname !== "/usuarios/novo"
     ) {
       window.location.href = "/login";
     }

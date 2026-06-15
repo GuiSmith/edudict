@@ -5,6 +5,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PersonIcon from "@mui/icons-material/Person";
 import WbSunnyIcon from "@mui/icons-material/WbSunny";
 import Avatar from "@mui/material/Avatar";
@@ -55,6 +56,12 @@ const navItems = [
     href: "/login",
     icon: LoginIcon,
     label: "Login",
+    type: "guest",
+  },
+  {
+    href: "/usuarios/novo",
+    icon: PersonAddIcon,
+    label: "Criar conta",
     type: "guest",
   },
   {

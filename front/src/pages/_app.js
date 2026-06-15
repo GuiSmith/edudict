@@ -1,8 +1,10 @@
 import "@/styles/globals.css";
 import "@scalar/api-reference-react/style.css";
+import "react-toastify/dist/ReactToastify.css";
 
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import { ToastContainer } from "react-toastify";
 
 import NavbarLayout from "@/components/Navbar";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
@@ -15,7 +17,7 @@ const isPublicRoute = (pathname) => {
 };
 
 const isGuestOnlyRoute = (pathname) => {
-  return pathname === "/login";
+  return pathname === "/login" || pathname === "/usuarios/novo";
 };
 
 function RouteGuard({ children }) {
@@ -64,6 +66,14 @@ export default function App({ Component, pageProps }) {
           <AppLayout>
             <Component {...pageProps} />
           </AppLayout>
+          <ToastContainer
+            autoClose={4000}
+            closeOnClick
+            draggable
+            newestOnTop
+            pauseOnFocusLoss={false}
+            position="top-right"
+          />
         </RouteGuard>
       </AuthProvider>
     </AppThemeProvider>

@@ -167,11 +167,8 @@ paths:
     post:
       tags:
         - Usuarios
-      security:
-        - bearerAuth: []
-        - cookieAuth: []
       summary: Criar usuario
-      description: Cria um novo usuario, registra a criacao no log da aplicacao e retorna os dados publicos do cadastro.
+      description: Cria um novo usuario por auto cadastro publico, registra a criacao no log da aplicacao e retorna os dados publicos do cadastro.
       operationId: criarUsuario
       requestBody:
         required: true
@@ -187,7 +184,6 @@ paths:
                   cpf: "12345678901"
                   email: maria.silva@example.com
                   senha: senha-segura
-                  ativo: true
       responses:
         "201":
           description: Usuario criado.
@@ -243,16 +239,6 @@ paths:
                       fields:
                         - cpf
                         - email
-        "401":
-          description: Autenticacao nao realizada.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              examples:
-                autenticacaoNaoRealizada:
-                  value:
-                    error: Autenticação não realizada
         "500":
           description: Erro inesperado.
           content:
@@ -443,10 +429,6 @@ components:
           type: string
           format: password
           example: senha-segura
-        ativo:
-          type: boolean
-          default: true
-          example: true
     EditarUsuarioRequest:
       type: object
       additionalProperties: true

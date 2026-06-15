@@ -6,6 +6,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Head from "next/head";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -129,6 +130,19 @@ export default function LoginPage() {
             >
               {isSubmitting ? "Entrando..." : "Entrar"}
             </Button>
+
+            <Typography align="center" color="text.secondary" variant="body2">
+              Ainda não possui uma conta?{" "}
+              <Typography
+                color="primary"
+                component={Link}
+                href="/usuarios/novo"
+                sx={{ textDecoration: "none" }}
+                variant="body2"
+              >
+                Criar conta
+              </Typography>
+            </Typography>
           </Stack>
         </Paper>
       </Box>
