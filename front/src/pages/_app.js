@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { AppThemeProvider } from "@/contexts/ThemeContext";
 
 const MAIN_ROUTE = "/";
 
@@ -52,10 +53,12 @@ function RouteGuard({ children }) {
 
 export default function App({ Component, pageProps }) {
   return (
-    <AuthProvider>
-      <RouteGuard>
-        <Component {...pageProps} />
-      </RouteGuard>
-    </AuthProvider>
+    <AppThemeProvider>
+      <AuthProvider>
+        <RouteGuard>
+          <Component {...pageProps} />
+        </RouteGuard>
+      </AuthProvider>
+    </AppThemeProvider>
   );
 }
