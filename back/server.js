@@ -20,7 +20,7 @@ app.use(authMiddleware);
 app.get("/health", (req, res) => {
   res.status(200).json({
     status: "ok",
-    service: "stocky-backend",
+    service: "edudict-backend",
   });
 });
 app.use(await loadRoutes());

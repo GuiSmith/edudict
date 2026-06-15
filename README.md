@@ -1,6 +1,6 @@
-# Stocky
+# edudict
 
-Stocky é um sistema web de gerenciamento de estoque, dividido em front-end Next.js e back-end Express com Prisma ORM e PostgreSQL.
+edudict é um sistema web de gerenciamento de estoque, dividido em front-end Next.js e back-end Express com Prisma ORM e PostgreSQL.
 
 ## Tecnologias
 
@@ -70,9 +70,9 @@ make dev-down
 
 Containers esperados em desenvolvimento:
 
-* `stocky-dev-db`: PostgreSQL.
-* `stocky-dev-back`: back-end.
-* `stocky-dev-front`: front-end.
+* `edudict-dev-db`: PostgreSQL.
+* `edudict-dev-back`: back-end.
+* `edudict-dev-front`: front-end.
 
 Portas padrão conforme `infra/.env.example`:
 

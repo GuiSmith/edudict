@@ -1,19 +1,19 @@
 # Skill: testar rota API
 
-Use esta skill quando o usuário pedir para testar uma rota API do projeto `stocky`.
+Use esta skill quando o usuário pedir para testar uma rota API do projeto `edudict`.
 
 ## Condição obrigatória
 
 Antes de testar qualquer rota, verifique se pelo menos um destes containers está em execução:
 
-- `stocky-dev-back`
-- `stocky-back`
+- `edudict-dev-back`
+- `edudict-back`
 
 Se nenhum deles estiver rodando, pare e informe que o backend local não está ativo.
 
 ## Escopo
 
-Esta skill deve ser usada apenas para testes locais do projeto `stocky`.
+Esta skill deve ser usada apenas para testes locais do projeto `edudict`.
 
 Se o usuário pediu o teste, assuma que está autorizado a:
 
@@ -28,7 +28,7 @@ Crie os arquivos de teste dentro do diretório:
 
 `/back/tests`
 
-Esse diretório fica na raiz do projeto `stocky`.
+Esse diretório fica na raiz do projeto `edudict`.
 
 O diretório já está ignorado no `.gitignore`, então pode criar arquivos nele sem preocupação com versionamento.
 

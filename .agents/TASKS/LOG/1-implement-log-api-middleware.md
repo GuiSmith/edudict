@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Implementar o log de requisições da API no back-end do projeto Stocky.
+Implementar o log de requisições da API no back-end do projeto edudict.
 
 ---
 

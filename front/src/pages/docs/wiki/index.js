@@ -134,8 +134,8 @@ export default function WikiPage() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Head>
-        <title>Stocky Wiki do Sistema</title>
-        <meta name="description" content="Wiki funcional do sistema Stocky" />
+        <title>edudict Wiki do Sistema</title>
+        <meta name="description" content="Wiki funcional do sistema edudict" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 

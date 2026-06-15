@@ -25,7 +25,7 @@ export default function VisaoGeralTab() {
     <WikiTabContent
       blocks={blocks}
       description="Esta página documenta os fluxos de autenticação e usuários que já existem no código atual da aplicação."
-      title="Wiki funcional do Stocky"
+      title="Wiki funcional do edudict"
     />
   );
 }

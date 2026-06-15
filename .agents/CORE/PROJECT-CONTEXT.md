@@ -2,7 +2,7 @@
 
 ## Contexto acadêmico
 
-O Stocky é um trabalho acadêmico da disciplina Programação III.
+O edudict é um trabalho acadêmico da disciplina Programação III.
 
 A disciplina pertence aos cursos Ciência da Computação e Sistemas de Informação e o projeto está sendo desenvolvido no contexto universitário em Chapecó/SC.
 
@@ -12,7 +12,7 @@ O professor da disciplina é Wagner Titon.
 
 O tema escolhido pelo grupo é um sistema web de controle e gerenciamento de estoque.
 
-O sistema recebeu o nome Stocky.
+O sistema recebeu o nome edudict.
 
 ## Datas
 
@@ -35,7 +35,7 @@ A aplicação deve ter:
 
 O grupo deve usar no mínimo 3 Design Patterns e explicar onde e por que foram utilizados.
 
-No Stocky, os padrões previstos como referência arquitetural são:
+No edudict, os padrões previstos como referência arquitetural são:
 
 * Repository Pattern.
 * Service Layer.
@@ -45,7 +45,7 @@ No Stocky, os padrões previstos como referência arquitetural são:
 
 ## API REST
 
-A API REST é opcional no enunciado, mas será implementada no Stocky como parte da arquitetura da solução.
+A API REST é opcional no enunciado, mas será implementada no edudict como parte da arquitetura da solução.
 
 ## Banco de dados
 

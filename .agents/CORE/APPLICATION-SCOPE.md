@@ -2,7 +2,7 @@
 
 ## Objetivo da solução
 
-O objetivo do Stocky é permitir o gerenciamento de estoque de uma organização com múltiplas filiais, almoxarifados, usuários e produtos.
+O objetivo do edudict é permitir o gerenciamento de estoque de uma organização com múltiplas filiais, almoxarifados, usuários e produtos.
 
 A aplicação permitirá controlar:
 

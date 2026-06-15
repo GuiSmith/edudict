@@ -18,7 +18,7 @@ export default function ApiDocsPage({ openapi }) {
   return (
     <>
       <Head>
-        <title>Stocky API Docs</title>
+        <title>edudict API Docs</title>
       </Head>
 
       <ApiReferenceReact

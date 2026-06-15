@@ -38,7 +38,7 @@ A coluna `operacao` deve aceitar somente:
 
 Não criar índices nesta migration por enquanto.
 
-Após criar a migration, pode usar `docker exec stocky-dev-back npm run db:sync` se quiser testar, estamos no ambiente dev rsrs
+Após criar a migration, pode usar `docker exec edudict-dev-back npm run db:sync` se quiser testar, estamos no ambiente dev rsrs
 
 ## 2. Configurar DTO e service
 

@@ -1,7 +1,7 @@
 services:
-  stocky-db:
+  edudict-db:
     image: postgres:latest
-    container_name: stocky-db
+    container_name: edudict-db
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
@@ -16,19 +16,19 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - stocky-network
+      - edudict-network
 
-  stocky-back:
+  edudict-back:
     build:
       context: ../back
       dockerfile: Dockerfile
-    container_name: stocky-back
+    container_name: edudict-back
     env_file:
       - .env
     ports:
       - "${BACK_HOST_PORT}:3000"
     depends_on:
-      stocky-db:
+      edudict-db:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health >/dev/null 2>&1"]
@@ -36,21 +36,21 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - stocky-network
+      - edudict-network
 
-  stocky-front:
+  edudict-front:
     build:
       context: ../front
       dockerfile: Dockerfile
-    container_name: stocky-front
+    container_name: edudict-front
     restart: unless-stopped
     ports:
       - "${FRONT_HOST_PORT}:80"
     depends_on:
-      stocky-back:
+      edudict-back:
         condition: service_healthy
     networks:
-      - stocky-network
+      - edudict-network
 
 volumes:
   db-data:
@@ -58,5 +58,5 @@ volumes:
   front-node-modules:
 
 networks:
-  stocky-network:
+  edudict-network:
     driver: bridge

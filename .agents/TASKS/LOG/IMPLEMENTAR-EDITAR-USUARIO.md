@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Implementar a funcionalidade de edição de usuário no back-end do Stocky.
+Implementar a funcionalidade de edição de usuário no back-end do edudict.
 
 A funcionalidade deve permitir atualizar dados de um usuário existente. O `id` do usuário deve ser obrigatório no body da requisição, enquanto os demais campos devem ser opcionais.
 

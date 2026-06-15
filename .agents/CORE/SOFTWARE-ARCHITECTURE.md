@@ -2,7 +2,7 @@
 
 ## Visão geral
 
-O Stocky é separado em front-end web e back-end API REST.
+O edudict é separado em front-end web e back-end API REST.
 
 O back-end é responsável por:
 

@@ -1,7 +1,7 @@
 services:
-  stocky-db:
+  edudict-db:
     image: postgres:latest
-    container_name: stocky-dev-db
+    container_name: edudict-dev-db
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
@@ -16,11 +16,11 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - stocky-network
+      - edudict-network
 
-  stocky-back:
+  edudict-back:
     image: node:20-alpine
-    container_name: stocky-dev-back
+    container_name: edudict-dev-back
     working_dir: /app
     volumes:
       - ../back:/app
@@ -30,7 +30,7 @@ services:
     ports:
       - "${BACK_HOST_PORT_DEV}:3000"
     depends_on:
-      stocky-db:
+      edudict-db:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health >/dev/null 2>&1"]
@@ -38,12 +38,12 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - stocky-network
+      - edudict-network
     command: sh -c "npm install && npm run dev"
 
-  stocky-front:
+  edudict-front:
     image: node:20-alpine
-    container_name: stocky-dev-front
+    container_name: edudict-dev-front
     working_dir: /app
     volumes:
       - ../front:/app
@@ -51,10 +51,10 @@ services:
     ports:
       - "${FRONT_HOST_PORT_DEV}:3000"
     depends_on:
-      stocky-back:
+      edudict-back:
         condition: service_healthy
     networks:
-      - stocky-network
+      - edudict-network
     command: sh -c "npm install && npm run dev"
 
 volumes:
@@ -63,5 +63,5 @@ volumes:
   front-node-modules:
 
 networks:
-  stocky-network:
+  edudict-network:
     driver: bridge
