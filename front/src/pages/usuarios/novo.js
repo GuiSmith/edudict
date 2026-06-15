@@ -1,4 +1,3 @@
-import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
@@ -12,6 +11,9 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 import authAxios from "@/utils/authAxios";
+import formatCpf from "@/utils/formatCpf";
+import getApiErrorMessage from "@/utils/getApiErrorMessage";
+import getOnlyDigits from "@/utils/getOnlyDigits";
 
 const INITIAL_FORM_DATA = {
   nome: "",
@@ -21,54 +23,9 @@ const INITIAL_FORM_DATA = {
   confirmarSenha: "",
 };
 
-const getOnlyDigits = (value) => value.replace(/\D/g, "");
-
-const formatCpf = (value) => {
-  const digits = getOnlyDigits(value).slice(0, 11);
-
-  if (digits.length <= 3) {
-    return digits;
-  }
-
-  if (digits.length <= 6) {
-    return `${digits.slice(0, 3)}.${digits.slice(3)}`;
-  }
-
-  if (digits.length <= 9) {
-    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
-  }
-
-  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
-};
-
-const getApiErrorMessage = (error) => {
-  const fields = error.response?.data?.details?.fields || [];
-
-  if (error.response?.status === 409) {
-    if (fields.includes("cpf") && fields.includes("email")) {
-      return "CPF e e-mail já cadastrados.";
-    }
-
-    if (fields.includes("cpf")) {
-      return "CPF já cadastrado.";
-    }
-
-    if (fields.includes("email")) {
-      return "E-mail já cadastrado.";
-    }
-  }
-
-  if (error.response?.data?.error) {
-    return error.response.data.error;
-  }
-
-  return "Ocorreu um erro ao realizar o cadastro. Tente novamente mais tarde.";
-};
-
 export default function NovoUsuarioPage() {
   const router = useRouter();
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
-  const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (event) => {
@@ -82,28 +39,23 @@ export default function NovoUsuarioPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setErrorMessage("");
 
     if (getOnlyDigits(formData.cpf).length !== 11) {
-      setErrorMessage("Informe um CPF válido.");
       toast.error("Informe um CPF válido.");
       return;
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setErrorMessage("Informe um e-mail válido.");
       toast.error("Informe um e-mail válido.");
       return;
     }
 
     if (!formData.senha) {
-      setErrorMessage("Informe uma senha.");
       toast.error("Informe uma senha.");
       return;
     }
 
     if (formData.senha !== formData.confirmarSenha) {
-      setErrorMessage("A confirmação de senha deve ser igual à senha.");
       toast.error("A confirmação de senha deve ser igual à senha.");
       return;
     }
@@ -123,7 +75,6 @@ export default function NovoUsuarioPage() {
     } catch (error) {
       const nextErrorMessage = getApiErrorMessage(error);
 
-      setErrorMessage(nextErrorMessage);
       toast.error(nextErrorMessage);
     } finally {
       setIsSubmitting(false);
@@ -176,9 +127,6 @@ export default function NovoUsuarioPage() {
                 Informe seus dados para acessar o sistema.
               </Typography>
             </Stack>
-
-            {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
-
             <TextField
               autoComplete="name"
               disabled={isSubmitting}

@@ -72,7 +72,7 @@ export default function App({ Component, pageProps }) {
             draggable
             newestOnTop
             pauseOnFocusLoss={false}
-            position="top-right"
+            position="bottom-right"
           />
         </RouteGuard>
       </AuthProvider>
