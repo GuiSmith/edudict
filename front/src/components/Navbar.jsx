@@ -141,9 +141,12 @@ function NavbarItem({ collapsed, item, mobile, onNavigate, usuario }) {
           borderLeft: "4px solid",
           borderLeftColor: isActive ? "primary.main" : "transparent",
           borderRadius: 1,
+          boxSizing: "border-box",
           justifyContent: collapsed && !mobile ? "center" : "flex-start",
           minHeight: 44,
+          overflowX: "hidden",
           px: collapsed && !mobile ? 1 : 1.5,
+          width: "100%",
         }}
       >
         <ListItemIcon
@@ -155,7 +158,9 @@ function NavbarItem({ collapsed, item, mobile, onNavigate, usuario }) {
         >
           {icon}
         </ListItemIcon>
-        {collapsed && !mobile ? null : <ListItemText primary={item.label} />}
+        {collapsed && !mobile ? null : (
+          <ListItemText primary={item.label} sx={{ minWidth: 0 }} />
+        )}
       </ListItemButton>
     </Tooltip>
   );
@@ -172,7 +177,9 @@ function NavbarContent({ collapsed, mobile, onClose, onToggleCollapse }) {
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        width: collapsed && !mobile ? NAVBAR_COLLAPSED_WIDTH : NAVBAR_EXPANDED_WIDTH,
+        maxWidth: "100%",
+        overflowX: "hidden",
+        width: "100%",
       }}
     >
       <Box
@@ -202,7 +209,7 @@ function NavbarContent({ collapsed, mobile, onClose, onToggleCollapse }) {
 
       <Divider />
 
-      <List sx={{ flex: 1, px: 1, py: 1.5 }}>
+      <List sx={{ flex: 1, overflowX: "hidden", px: 1, py: 1.5 }}>
         {visibleItems.map((item) => (
           <NavbarItem
             collapsed={collapsed}
@@ -224,8 +231,11 @@ function NavbarContent({ collapsed, mobile, onClose, onToggleCollapse }) {
             onClick={toggleTheme}
             sx={{
               borderRadius: 1,
+              boxSizing: "border-box",
               justifyContent: collapsed && !mobile ? "center" : "flex-start",
+              overflowX: "hidden",
               px: collapsed && !mobile ? 1 : 1.5,
+              width: "100%",
             }}
           >
             <ListItemIcon
@@ -238,7 +248,10 @@ function NavbarContent({ collapsed, mobile, onClose, onToggleCollapse }) {
               {mode === "light" ? <DarkModeIcon fontSize="small" /> : <WbSunnyIcon fontSize="small" />}
             </ListItemIcon>
             {collapsed && !mobile ? null : (
-              <ListItemText primary={mode === "light" ? "Tema escuro" : "Tema claro"} />
+              <ListItemText
+                primary={mode === "light" ? "Tema escuro" : "Tema claro"}
+                sx={{ minWidth: 0 }}
+              />
             )}
           </ListItemButton>
         </Tooltip>
@@ -304,6 +317,7 @@ export default function NavbarLayout({ children }) {
           display: { md: "none", xs: "block" },
           "& .MuiDrawer-paper": {
             boxSizing: "border-box",
+            overflowX: "hidden",
             width: NAVBAR_EXPANDED_WIDTH,
           },
         }}
@@ -325,6 +339,7 @@ export default function NavbarLayout({ children }) {
           width: desktopWidth,
           "& .MuiDrawer-paper": {
             boxSizing: "border-box",
+            overflowX: "hidden",
             width: desktopWidth,
           },
         }}
