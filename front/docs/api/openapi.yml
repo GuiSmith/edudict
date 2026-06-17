@@ -9,9 +9,125 @@ servers:
 tags:
   - name: Auth
     description: Autenticacao de usuarios.
+  - name: Predict
+    description: Predicao de aprovacao de estudante.
   - name: Usuarios
     description: Gerenciamento de usuarios.
 paths:
+  /predict:
+    post:
+      tags:
+        - Predict
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      summary: Predizer aprovacao de estudante
+      description: Valida os dados do estudante no backend, encaminha o payload para o servico Python student-approval em /predict e retorna a predicao calculada.
+      operationId: predictStudentApproval
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentApprovalPredictionRequest"
+            examples:
+              payloadValido:
+                value:
+                  school: GP
+                  sex: F
+                  age: 17
+                  address: U
+                  famsize: GT3
+                  Pstatus: T
+                  Medu: 4
+                  Fedu: 4
+                  Mjob: teacher
+                  Fjob: other
+                  reason: course
+                  guardian: mother
+                  traveltime: 1
+                  studytime: 2
+                  failures: 0
+                  schoolsup: "no"
+                  famsup: "yes"
+                  paid: "no"
+                  activities: "yes"
+                  nursery: "yes"
+                  higher: "yes"
+                  internet: "yes"
+                  romantic: "no"
+                  famrel: 4
+                  freetime: 3
+                  goout: 3
+                  Dalc: 1
+                  Walc: 1
+                  health: 5
+                  absences: 4
+                  subject: math
+      responses:
+        "200":
+          description: Predicao calculada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentApprovalPredictionResponse"
+              examples:
+                aprovado:
+                  value:
+                    success: true
+                    prediction: 1
+                    label: approved
+                    probabilities:
+                      approved: 0.82
+                      not_approved: 0.18
+        "400":
+          description: Payload invalido no backend ou recusado pelo servico de predicao.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                dadosInvalidos:
+                  value:
+                    error: Dados inválidos para predição
+                    details:
+                      errors:
+                        - field: age
+                          message: Value must be an integer between 15 and 22.
+                          received: 30
+        "401":
+          description: Autenticacao nao realizada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                autenticacaoNaoRealizada:
+                  value:
+                    error: Autenticação não realizada
+        "502":
+          description: Falha ao comunicar com o servico Python de predicao.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                servicoIndisponivel:
+                  value:
+                    error: Serviço de predição indisponível
+                    details:
+                      service: student-approval
+                      reason: connection_error
+        "500":
+          description: Erro inesperado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                erroInterno:
+                  value:
+                    error: Erro interno do servidor
   /auth/me:
     get:
       tags:
@@ -380,6 +496,175 @@ components:
       name: token
       description: Token informado no cookie httpOnly `token`.
   schemas:
+    StudentApprovalPredictionRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - school
+        - sex
+        - age
+        - address
+        - famsize
+        - Pstatus
+        - Medu
+        - Fedu
+        - Mjob
+        - Fjob
+        - reason
+        - guardian
+        - traveltime
+        - studytime
+        - failures
+        - schoolsup
+        - famsup
+        - paid
+        - activities
+        - nursery
+        - higher
+        - internet
+        - romantic
+        - famrel
+        - freetime
+        - goout
+        - Dalc
+        - Walc
+        - health
+        - absences
+        - subject
+      properties:
+        school:
+          type: string
+          enum: [GP, MS]
+        sex:
+          type: string
+          enum: [F, M]
+        age:
+          type: integer
+          minimum: 15
+          maximum: 22
+        address:
+          type: string
+          enum: [U, R]
+        famsize:
+          type: string
+          enum: [LE3, GT3]
+        Pstatus:
+          type: string
+          enum: [T, A]
+        Medu:
+          type: integer
+          minimum: 0
+          maximum: 4
+        Fedu:
+          type: integer
+          minimum: 0
+          maximum: 4
+        Mjob:
+          type: string
+          enum: [teacher, health, services, at_home, other]
+        Fjob:
+          type: string
+          enum: [teacher, health, services, at_home, other]
+        reason:
+          type: string
+          enum: [home, reputation, course, other]
+        guardian:
+          type: string
+          enum: [mother, father, other]
+        traveltime:
+          type: integer
+          minimum: 1
+          maximum: 4
+        studytime:
+          type: integer
+          minimum: 1
+          maximum: 4
+        failures:
+          type: integer
+          minimum: 0
+          maximum: 4
+        schoolsup:
+          type: string
+          enum: ["yes", "no"]
+        famsup:
+          type: string
+          enum: ["yes", "no"]
+        paid:
+          type: string
+          enum: ["yes", "no"]
+        activities:
+          type: string
+          enum: ["yes", "no"]
+        nursery:
+          type: string
+          enum: ["yes", "no"]
+        higher:
+          type: string
+          enum: ["yes", "no"]
+        internet:
+          type: string
+          enum: ["yes", "no"]
+        romantic:
+          type: string
+          enum: ["yes", "no"]
+        famrel:
+          type: integer
+          minimum: 1
+          maximum: 5
+        freetime:
+          type: integer
+          minimum: 1
+          maximum: 5
+        goout:
+          type: integer
+          minimum: 1
+          maximum: 5
+        Dalc:
+          type: integer
+          minimum: 1
+          maximum: 5
+        Walc:
+          type: integer
+          minimum: 1
+          maximum: 5
+        health:
+          type: integer
+          minimum: 1
+          maximum: 5
+        absences:
+          type: integer
+          minimum: 0
+          maximum: 93
+        subject:
+          type: string
+          enum: [math, portuguese]
+    StudentApprovalPredictionResponse:
+      type: object
+      required:
+        - success
+        - prediction
+        - label
+        - probabilities
+      properties:
+        success:
+          type: boolean
+          example: true
+        prediction:
+          oneOf:
+            - type: integer
+            - type: string
+          example: 1
+        label:
+          type: string
+          example: approved
+        probabilities:
+          type: object
+          additionalProperties:
+            type: number
+            format: float
+          example:
+            approved: 0.82
+            not_approved: 0.18
     LoginRequest:
       type: object
       additionalProperties: true
