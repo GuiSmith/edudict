@@ -13,15 +13,16 @@ model migrations {
 }
 
 model usuario {
-  id      Int       @id @default(autoincrement())
-  nome    String    @db.VarChar(150)
-  cpf     String    @unique @db.Char(11)
-  email   String    @unique @db.VarChar(150)
-  senha   String
-  ativo   Boolean   @default(true)
-  log_api log_api[]
-  log_app log_app[]
-  tokens  token[]
+  id       Int        @id @default(autoincrement())
+  nome     String     @db.VarChar(150)
+  cpf      String     @unique @db.Char(11)
+  email    String     @unique @db.VarChar(150)
+  senha    String
+  ativo    Boolean    @default(true)
+  log_api  log_api[]
+  log_app  log_app[]
+  predicao predicao[]
+  tokens   token[]
 }
 
 model token {
@@ -64,4 +65,47 @@ model log_app {
   antes      Json?
   depois     Json?
   usuario    usuario? @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model predicao {
+  id                 Int      @id @default(autoincrement())
+  id_usuario         Int?
+  guest_session_id   String?  @db.Uuid
+  school             String   @db.VarChar(2)
+  sex                String   @db.VarChar(1)
+  age                Int
+  address            String   @db.VarChar(1)
+  famsize            String   @db.VarChar(3)
+  Pstatus            String   @db.VarChar(1)
+  Medu               Int
+  Fedu               Int
+  Mjob               String   @db.VarChar(20)
+  Fjob               String   @db.VarChar(20)
+  reason             String   @db.VarChar(20)
+  guardian           String   @db.VarChar(20)
+  traveltime         Int
+  studytime          Int
+  failures           Int
+  schoolsup          String   @db.VarChar(3)
+  famsup             String   @db.VarChar(3)
+  paid               String   @db.VarChar(3)
+  activities         String   @db.VarChar(3)
+  nursery            String   @db.VarChar(3)
+  higher             String   @db.VarChar(3)
+  internet           String   @db.VarChar(3)
+  romantic           String   @db.VarChar(3)
+  famrel             Int
+  freetime           Int
+  goout              Int
+  Dalc               Int
+  Walc               Int
+  health             Int
+  absences           Int
+  subject            String   @db.VarChar(20)
+  aprovado           Boolean
+  resultado_predicao Json
+  interpretacao_llm  String?
+  data_hora_criacao  DateTime @default(now()) @db.Timestamp(6)
+  usuario            usuario? @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
