@@ -10,9 +10,11 @@ O professor da disciplina é Wagner Titon.
 
 ## Tema escolhido
 
-O tema escolhido pelo grupo é um sistema web de controle e gerenciamento de estoque.
+O tema escolhido pelo grupo é uma aplicação web de inteligência artificial preditiva com agente inteligente.
 
 O sistema recebeu o nome edudict.
+
+O usuário informa os dados necessários para uma predição, o back-end consulta uma API externa que executa o modelo treinado e devolve o resultado bruto. Opcionalmente, o usuário pode criar um chat vinculado à predição para que um agente inteligente interprete o resultado dentro do domínio permitido pelo sistema.
 
 ## Datas
 

@@ -11,6 +11,10 @@ O back-end é responsável por:
 * Autenticação.
 * WebSockets.
 * Comunicação com serviços externos.
+* Chamada à API externa que executa o modelo treinado.
+* Integração com o serviço de agente LLM.
+
+O back-end não carrega nem executa o modelo treinado localmente. A predição é realizada por uma API externa, chamada pela camada de service.
 
 ## Arquitetura do front-end
 
@@ -104,11 +108,9 @@ Exemplos previstos:
 
 * `routes/auth.routes.js`: rotas de autenticação, como login, logout, checar autenticação e recuperação de senha.
 * `routes/usuarios.routes.js`: CRUD de usuários.
-* `routes/permissoes.routes.js`: CRUD de permissões de usuários.
-* `routes/produtos.routes.js`: CRUD de produtos.
-* `routes/almoxarifados.routes.js`: CRUD de almoxarifados.
-* `routes/filiais.routes.js`: CRUD de filiais.
-* `routes/inventarios.routes.js`: CRUD de inventários.
+* `routes/predicoes.routes.js`: criação e histórico de predições.
+* `routes/chats.routes.js`: criação e histórico de chats.
+* `routes/mensagens.routes.js`: envio e listagem de mensagens.
 
 ### Controllers
 
@@ -120,10 +122,9 @@ Exemplos previstos:
 
 * `controllers/auth.controller.js`.
 * `controllers/usuarios.controller.js`.
-* `controllers/produtos.controller.js`.
-* `controllers/almoxarifados.controller.js`.
-* `controllers/filiais.controller.js`.
-* `controllers/inventarios.controller.js`.
+* `controllers/predicoes.controller.js`.
+* `controllers/chats.controller.js`.
+* `controllers/mensagens.controller.js`.
 
 ### DTOs
 
@@ -135,6 +136,9 @@ Exemplos:
 
 * `src/dtos/auth/login.dto.js`.
 * `src/dtos/usuario/criar-usuario.dto.js`.
+* `src/dtos/predicao/criar-predicao.dto.js`.
+* `src/dtos/chat/criar-chat.dto.js`.
+* `src/dtos/mensagem/criar-mensagem.dto.js`.
 * `src/dtos/log-app/criar-log.dto.js`.
 
 DTOs podem:
@@ -167,10 +171,13 @@ Exemplos previstos:
 * `services/auth.service.js`.
 * `services/log-app.service.js`.
 * `services/usuarios.service.js`.
-* `services/produtos.service.js`.
-* `services/estoque.service.js`.
-* `services/inventarios.service.js`.
-* `services/email.service.js`.
+* `services/predicoes.service.js`.
+* `services/api-predicao.service.js`.
+* `services/chats.service.js`.
+* `services/mensagens.service.js`.
+* `services/agente.service.js`.
+
+Services podem se comunicar com integrações externas, desde que mantenham as responsabilidades separadas. O service de predições coordena a regra da aplicação, enquanto o client ou service de integração chama a API externa. Da mesma forma, o service do agente controla o contexto permitido e chama o serviço LLM.
 
 ### Repositories
 
@@ -187,10 +194,10 @@ Regras:
 Exemplos previstos:
 
 * `repositories/usuarios.repository.js`.
-* `repositories/produtos.repository.js`.
-* `repositories/almoxarifados.repository.js`.
-* `repositories/filiais.repository.js`.
-* `repositories/inventarios.repository.js`.
+* `repositories/predicoes.repository.js`.
+* `repositories/chats.repository.js`.
+* `repositories/mensagens.repository.js`.
+* `repositories/tokens-autenticacao.repository.js`.
 
 ### Middlewares
 
@@ -368,6 +375,10 @@ Arquivos previstos:
 * `config/database.js` para conexão com o banco de dados via Prisma ORM.
 * `config/rabbitmq.js` para conexão com RabbitMQ.
 * `config/websocket.js` para conexões WebSocket.
+* Configuração do client da API externa de predição.
+* Configuração do client do serviço de agente LLM.
+
+Clients compartilhados e reutilizáveis para integrações externas podem usar Singleton quando isso evitar instâncias ou conexões desnecessárias.
 
 ## `log_app`
 
@@ -454,35 +465,30 @@ A API será organizada por domínio.
 * PUT: `/usuarios`: editar usuário
 * GET: `/usuarios`: listar usuários
 
-#### Filiais
+#### Predições
 
-* POST: `/filiais`: criar filial
-* PUT: `/filiais/`: editar filial
-* GET: `/filiais/`: listar filiais
+* POST: `/predicoes`: validar os dados, chamar a API externa, persistir e retornar a predição
+* GET: `/predicoes`: listar o histórico de predições do usuário ou sessão visitante
 
-#### Almoxarifados
+#### Chats
 
-* POST: `/almoxarifados`: criar almoxarifado
-* PUT: `/almoxarifados`: editar almoxarifado
-* GET: `/almoxarifados`: listar almoxarifados
+* POST: `/chats`: criar um chat, opcionalmente vinculado a uma predição
+* GET: `/chats`: listar o histórico de chats do usuário ou sessão visitante
 
-#### Produtos
+#### Mensagens
 
-* POST: `/produtos`: criar produto
-* PUT: `/produtos`: editar produto
-* GET: `/produtos`: listar produtos
+* GET: `/mensagens`: listar as mensagens de um chat
+* POST: `/mensagens`: persistir a mensagem do usuário, chamar o agente e persistir a resposta
 
-#### Inventários
-
-* POST: `/inventarios`: criar inventário
-* GET: `/inventarios`: listar inventários
+As rotas disponíveis para visitantes devem receber o `guest_session_id` enviado pelo front-end. Esse identificador associa predições, chats e mensagens à sessão visitante, mas não autentica o usuário.
 
 ### Requisitos da API
 
 * Retorno em JSON.
 * Validação de dados.
 * Tratamento de erros.
-* CRUD completo nos principais módulos.
+* Controle de acesso aos dados do usuário ou da sessão visitante.
+* Tratamento de falhas nas integrações externas.
 * Organização por rotas, controllers, services e repositories.
 
 ## Design Patterns utilizados
@@ -493,9 +499,11 @@ Será usado para isolar o acesso ao banco de dados.
 
 Exemplos:
 
-* `produtos.repository.js`.
 * `usuarios.repository.js`.
-* `inventarios.repository.js`.
+* `predicoes.repository.js`.
+* `chats.repository.js`.
+* `mensagens.repository.js`.
+* `tokens-autenticacao.repository.js`.
 
 Motivo:
 
@@ -508,9 +516,13 @@ Será usado para concentrar regras de negócio e manipulação de dados no banco
 
 Exemplos:
 
-* Validar se o usuário pode acessar determinado almoxarifado.
-* Verificar se produto único já possui número de série cadastrado.
-* Calcular diferença entre estoque esperado e estoque inventariado.
+* Validar e criar uma predição.
+* Chamar a API externa de predição.
+* Persistir e retornar o resultado bruto.
+* Criar um chat a partir de uma predição.
+* Enviar mensagem ao agente e persistir a resposta.
+* Garantir que usuário ou sessão visitante só acesse seus próprios dados.
+* Aplicar a restrição de escopo do agente.
 
 Motivo:
 
@@ -529,8 +541,9 @@ Exemplos:
 * `dtos/auth/login.dto.js`.
 * `dtos/usuario/criar-usuario.dto.js`.
 * `dtos/usuario/editar-usuario.dto.js`.
-* `dtos/produto/criar-produto.dto.js`.
-* `dtos/inventario/registrar-inventario.dto.js`.
+* `dtos/predicao/criar-predicao.dto.js`.
+* `dtos/chat/criar-chat.dto.js`.
+* `dtos/mensagem/criar-mensagem.dto.js`.
 
 Motivo:
 
@@ -546,6 +559,7 @@ Será usado para:
 
 * Conexão com banco de dados, especialmente no WebSocket.
 * WebSocket.
+* Clients reutilizáveis da API externa de predição e do serviço de agente, quando aplicável.
 
 Motivo:
 
@@ -557,9 +571,8 @@ Será usado no WebSocket para notificar telas em tempo real.
 
 Exemplos:
 
-* Atualização de estoque.
-* Dashboard.
-* Inventário.
+* Atualização do histórico de predições.
+* Atualização de chats e mensagens.
 * Notificações para o usuário.
 
 Motivo:
@@ -568,15 +581,51 @@ Motivo:
 
 ## Relacionamentos principais
 
-* Um usuário pode ter no mínimo 0 e no máximo vários almoxarifados
-* Um usuário pode pertencer a no mínimo 0 e no máximo várias filiais
-* Um item de saldo pertence simultaneamente a:
-  1. Um produto
-  2. Um almoxarifado
-  3. Uma filial
-* Um produto único pertence simultaneamente a:
-  1. Um produto
-  2. Um almoxarifado
-  3. Uma filial
-* Um inventário pertence a um almoxarifado e filial apenas
-* Um inventário pode ter vários itens, mas não dois itens de inventário do mesmo registro de produto
+* Um usuário autenticado pode ter zero ou vários tokens de autenticação.
+* Um token de autenticação pertence a apenas um usuário autenticado.
+* Um usuário ou sessão visitante pode ter zero ou várias predições.
+* Uma predição pertence a apenas um usuário ou sessão visitante.
+* Um usuário ou sessão visitante pode ter zero ou vários chats.
+* Um chat pertence a apenas um usuário ou sessão visitante.
+* Uma predição pode ter zero ou vários chats.
+* Um chat pode estar vinculado a uma predição.
+* Um chat pode ter uma ou várias mensagens.
+* Uma mensagem pertence a apenas um chat.
+
+Resumo:
+
+```txt
+Usuário/Sessão visitante 1:N Predição
+Usuário/Sessão visitante 1:N Chat
+Predição 0:N Chat
+Chat 1:N Mensagem
+Usuário autenticado 1:N Token de autenticação
+```
+
+## Fluxos do novo domínio
+
+### Geração de predição
+
+1. O front-end identifica o usuário autenticado ou gera e envia um `guest_session_id`.
+2. O controller recebe os dados e usa o DTO de criação de predição.
+3. O service de predições chama o service ou client da API externa.
+4. A API externa executa o modelo treinado e retorna o resultado bruto.
+5. O service persiste a predição e o respectivo `log_app` na mesma transação.
+6. O controller retorna o resultado bruto ao front-end.
+
+O agente não participa desse fluxo.
+
+### Criação de chat e interpretação
+
+1. Depois de visualizar o resultado bruto, o usuário solicita a criação de um chat.
+2. O service valida se a predição pertence ao usuário ou à sessão visitante.
+3. O chat é persistido e vinculado à predição.
+4. Ao receber uma mensagem, o service do agente limita o contexto aos dados permitidos.
+5. O serviço LLM gera uma resposta.
+6. As mensagens do usuário e do agente são persistidas.
+
+### Restrição de escopo do agente
+
+O agente só pode responder sobre o contexto de treinamento e modelagem fornecido ao sistema, o resultado bruto da predição, sua explicação, as variáveis usadas pelo modelo e as funcionalidades do edudict.
+
+Assuntos fora desse domínio devem receber uma recusa educada e objetiva. Essa regra pertence à camada de service e deve ser aplicada antes e durante a composição do contexto enviado ao serviço LLM.

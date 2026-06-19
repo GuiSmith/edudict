@@ -2,33 +2,30 @@
 
 ## Objetivo da solução
 
-O objetivo do edudict é permitir o gerenciamento de estoque de uma organização com múltiplas filiais, almoxarifados, usuários e produtos.
+O objetivo do edudict é oferecer uma aplicação web de inteligência artificial preditiva na qual usuários autenticados ou visitantes possam informar dados, receber o resultado bruto de uma predição e, opcionalmente, criar um chat para obter uma interpretação contextualizada desse resultado.
 
-A aplicação permitirá controlar:
+O modelo treinado não é executado pelo back-end do edudict. O back-end valida os dados recebidos, chama uma API externa responsável pela predição, persiste a consulta e devolve ao front-end o resultado bruto retornado.
 
-* Produtos comuns: produtos que apenas possuem saldo
-* Produtos únicos com número de série e MAC: produtos onde cada unidade de saldo representa um objeto físico real
-* Movimentações de estoque.
-* Associação de usuários a almoxarifados.
-* Inventários de estoque.
+O agente inteligente também não é acionado automaticamente durante a predição. Depois de visualizar o resultado bruto, o usuário decide se deseja criar um chat vinculado àquela predição. Somente dentro desse chat o agente recebe o contexto necessário para interpretar o resultado.
 
 ## Escopo funcional principal
 
 O sistema terá:
 
-* Autenticação de usuários: login + logout
-* Gerenciamento de usuários: cadastro + edição
+* Autenticação de usuários: login e logout.
+* Uso sem conta por meio de `guest_session_id`.
+* Geração e persistência de predições.
+* Integração com uma API externa de predição.
+* Visualização do resultado bruto retornado pela API externa.
+* Criação opcional de chat a partir de uma predição.
+* Envio, persistência e listagem de mensagens.
+* Interpretação da predição por um agente inteligente.
+* Restrição do agente aos assuntos permitidos pelo domínio.
+* Histórico de predições.
+* Histórico de chats.
 * Tema claro e escuro.
-* Dashboard com dados em tempo real via WebSocket.
-* Gerenciamento de filiais: cadastro + edição
-* Gerenciamento de almoxarifados: cadastro + edição
-* Associação de usuários a almoxarifados.
-* Cadastro de produtos.
-* Cadastro de produtos únicos.
-* Controle de saldo de estoque por almoxarifado e filial.
-* Inventário de estoque.
-* Envio de e-mails via fila com RabbitMQ.
-* Integração com serviço externo de arquivos como OperaFR.
+* Interface responsiva.
+* Documentação da API.
 
 ## Módulos funcionais
 
@@ -37,125 +34,166 @@ O sistema terá:
 * Login.
 * Logout.
 * Proteção de rotas.
-* Token JWT.
+* Token de autenticação.
 * Verificação de usuário autenticado.
+
+Usuários autenticados podem possuir um ou vários tokens, e cada token pertence a apenas um usuário.
+
+### Sessão visitante
+
+O sistema deve permitir o uso sem conta.
+
+Para usuários não autenticados:
+
+* O front-end gera um `guest_session_id`.
+* O identificador é salvo no `localStorage`.
+* O identificador é enviado nas requisições ao back-end.
+* O back-end associa predições, chats e mensagens à sessão visitante.
+
+O `guest_session_id` identifica uma sessão visitante e não deve ser tratado como token de autenticação.
+
+### Predições
+
+Uma predição representa uma consulta feita à API externa que contém e executa o modelo treinado.
+
+Fluxo:
+
+1. O usuário informa os dados exigidos pelo modelo.
+2. O front-end envia os dados e a identificação do usuário ou da sessão visitante.
+3. O back-end valida e normaliza os dados por meio de DTO.
+4. Um service chama a API externa de predição.
+5. A API externa executa o modelo e retorna o resultado.
+6. O back-end persiste os dados de entrada, o resultado bruto e os metadados aplicáveis.
+7. O back-end devolve o resultado bruto ao front-end.
+8. O front-end apresenta o resultado sem acionar automaticamente o agente.
+
+Uma predição pode armazenar:
+
+* Usuário autenticado ou `guest_session_id`.
+* Dados de entrada enviados.
+* Resultado bruto da predição.
+* Data e hora de criação.
+* Metadados retornados pela API externa, quando existirem.
+
+O sistema deve permitir consultar o histórico de predições associado ao usuário autenticado ou à sessão visitante.
+
+### Chats
+
+O chat é criado apenas quando o usuário solicita uma interpretação para uma predição já realizada.
+
+Regras:
+
+* O chat deve pertencer a um usuário autenticado ou a uma sessão visitante.
+* O chat pode estar vinculado a uma predição.
+* Ao criar o chat a partir de uma predição, o agente recebe o resultado bruto e o contexto permitido.
+* Criar uma predição não cria nem aciona um chat automaticamente.
+* O sistema deve permitir consultar o histórico de chats do usuário ou da sessão visitante.
+
+### Mensagens
+
+Uma mensagem representa uma interação dentro de um chat.
+
+* Cada mensagem pertence a apenas um chat.
+* Um chat pode possuir uma ou várias mensagens.
+* A origem da mensagem pode ser o usuário, o agente ou o sistema, quando necessário.
+* Mensagens do usuário e respostas do agente devem ser persistidas.
+* O sistema deve permitir listar as mensagens de um chat respeitando seu proprietário.
+
+### Agente inteligente
+
+O agente tem a função de interpretar a predição e explicar informações relacionadas ao funcionamento do sistema.
+
+O agente só pode responder sobre:
+
+1. Dados explícitos do contexto de treinamento e modelagem fornecido ao sistema.
+2. Resultado bruto da predição vinculada ao chat.
+3. Explicação da predição.
+4. Variáveis utilizadas pelo modelo.
+5. Funcionalidades do próprio edudict.
+
+O agente deve recusar, de forma educada e objetiva, qualquer assunto fora desse escopo. Isso inclui política, saúde, finanças, programação genérica, curiosidades, tarefas escolares não relacionadas ao sistema e qualquer outro tema sem relação com o modelo, a predição ou a aplicação.
 
 ### Usuários
 
-* Cadastro de usuários.
-* Listagem de usuários. 
-* Edição de usuários.
-* Associação de usuários a almoxarifados.
+O usuário representa uma pessoa que utiliza o sistema. O uso pode ocorrer:
 
-### Filiais
+* Como usuário autenticado, identificado pela autenticação normal.
+* Como visitante, identificado por `guest_session_id`.
 
-* Cadastro de filiais.
-* Edição de filiais.
-* Listagem de filiais.
-
-### Almoxarifados
-
-* Cadastro de almoxarifados.
-* Associação com usuários.
-* Visualização de estoque por almoxarifado.
-
-### Produtos
-
-* Cadastro de produtos.
-* Classificação entre produto comum e produto único.
-* Unidade de medida.
-* Estoque mínimo.
-* Estoque atual.
-* Associação com almoxarifado e filial.
-
-### Produtos únicos
-
-Produtos únicos são produtos controlados individualmente.
-
-Exemplos:
-
-* Roteador com número de série.
-* Equipamento com MAC address.
-* ONU.
-* Switch.
-* Notebook.
-
-Campos possíveis:
-
-* Produto base.
-* Número de série.
-* MAC.
-* Status.
-* Almoxarifado atual.
-* Filial atual.
-
-### Produtos comuns
-
-Produtos comuns são produtos controlados por quantidade.
-
-Exemplos:
-
-* Cabo.
-* Parafuso.
-* Conector.
-* Abraçadeira.
-* Etiqueta.
-
-Campos possíveis:
-
-* Produto.
-* Unidade de medida.
-* Quantidade.
-* Almoxarifado.
-* Filial.
-
-## Inventário
-
-O inventário permitirá que um usuário confira o estoque físico de um almoxarifado.
-
-Funcionalidades previstas:
-
-* Criar inventário.
-* Selecionar almoxarifado.
-* Listar produtos esperados.
-* Informar quantidade encontrada.
-* Informar produtos únicos encontrados.
-* Registrar divergências.
-* Finalizar inventário.
-* Gerar histórico.
-
-Cada item inventariado também possuirá vínculo com uma filial.
-
-## Dashboard em tempo real
-
-A dashboard poderá exibir:
-
-* Total de produtos cadastrados.
-* Total de itens em estoque.
-* Produtos abaixo do estoque mínimo.
-* Últimas movimentações.
-* Inventários em andamento.
-* Divergências recentes.
-
-As atualizações poderão ser enviadas em tempo real via WebSocket.
+Predições e chats devem ser associados a uma dessas formas de identificação para impedir acesso indevido ao histórico de outra pessoa ou sessão.
 
 ## Integrações no escopo funcional
 
-### RabbitMQ
+### API externa de predição
 
-RabbitMQ está previsto para envio assíncrono de e-mails.
+É responsável por executar o modelo treinado.
 
-### OperaFR
+O back-end do edudict:
 
-OperaFR está previsto como serviço externo para armazenamento e gerenciamento de arquivos.
+* Envia os dados validados.
+* Recebe o resultado bruto.
+* Trata falhas de comunicação.
+* Persiste e retorna a predição.
+
+### Serviço de agente LLM
+
+É responsável por gerar respostas dentro do chat usando o contexto permitido da predição e do sistema.
+
+O back-end deve controlar o contexto enviado ao serviço e aplicar a restrição de domínio do agente.
+
+## Entidades e relacionamentos principais
+
+### Usuário
+
+Representa o usuário autenticado. Pode possuir tokens, predições e chats.
+
+### Token de autenticação
+
+Representa uma sessão de autenticação:
+
+* Um usuário autenticado pode ter zero ou vários tokens.
+* Um token pertence a apenas um usuário autenticado.
+
+### Predição
+
+Representa uma consulta feita à API externa:
+
+* Um usuário ou sessão visitante pode ter zero ou várias predições.
+* Uma predição pertence a apenas um usuário ou sessão visitante.
+
+### Chat
+
+Representa uma conversa opcional criada a partir de uma predição:
+
+* Um usuário ou sessão visitante pode ter zero ou vários chats.
+* Um chat pertence a apenas um usuário ou sessão visitante.
+* Uma predição pode ter zero ou vários chats.
+* Um chat pode estar vinculado a uma predição.
+
+### Mensagem
+
+Representa uma interação dentro de um chat:
+
+* Um chat pode ter uma ou várias mensagens.
+* Uma mensagem pertence a apenas um chat.
+
+Resumo:
+
+```txt
+Usuário/Sessão visitante 1:N Predição
+Usuário/Sessão visitante 1:N Chat
+Predição 0:N Chat
+Chat 1:N Mensagem
+Usuário autenticado 1:N Token de autenticação
+```
 
 ## Diferenciais do projeto
 
-* WebSocket para atualização em tempo real.
-* RabbitMQ para envio assíncrono de e-mails.
-* Gerenciamento de anexos.
+* Uso autenticado ou como visitante.
+* Integração desacoplada com API externa de predição.
+* Resultado bruto disponível antes de qualquer interpretação.
+* Chat opcional e contextualizado por predição.
+* Agente com restrição explícita de domínio.
+* Persistência dos históricos de predições, chats e mensagens.
 * Tema claro e escuro.
 * Interface responsiva.
-* Controle de produtos únicos por número de série e MAC.
-* Inventário com registro de divergências.
-* Controle de estoque separado por filial.
