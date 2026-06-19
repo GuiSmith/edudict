@@ -23,7 +23,7 @@ paths:
         - cookieAuth: []
         - guestSession: []
       summary: Predizer aprovacao de estudante
-      description: Valida os dados do estudante no backend, encaminha o payload para o servico Python student-approval em /predict e retorna a predicao calculada. Aceita usuario autenticado ou convidado identificado pelo header X-Guest-Session-Id.
+      description: Valida os dados do estudante no backend, encaminha o payload para o servico Python student-approval em /predict, persiste os dados enviados, o resultado e a identidade do solicitante, e retorna a predicao calculada. Aceita usuario autenticado ou convidado identificado pelo header X-Guest-Session-Id.
       operationId: predictStudentApproval
       requestBody:
         required: true

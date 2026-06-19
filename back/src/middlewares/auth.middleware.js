@@ -7,8 +7,10 @@ const PUBLIC_ROUTES = [
   { method: 'POST', path: '/auth/login' },
   { method: 'POST', path: '/auth/logout' },
   { method: 'POST', path: '/usuarios' },
-  { method: "POST", path: "/predict" },
 ]
+const OPTIONAL_AUTH_ROUTES = [
+  { method: "POST", path: "/predict" },
+];
 
 const unauthorized = (res) => {
   return res.status(401).json({
@@ -63,11 +65,21 @@ const isPublicRoute = (req) => {
   return Boolean(PUBLIC_ROUTES.find(route => route.method === req.method && route.path === req.path));
 }
 
+const isOptionalAuthRoute = (req) => {
+  return OPTIONAL_AUTH_ROUTES.some(
+    (route) => route.method === req.method && route.path === req.path,
+  );
+};
+
 const authMiddleware = async (req, res, next) => {
   try {
     const requestToken = getRequestToken(req);
 
     if(isPublicRoute(req)){
+      return next();
+    }
+
+    if (isOptionalAuthRoute(req) && !requestToken) {
       return next();
     }
 

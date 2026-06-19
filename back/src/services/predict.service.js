@@ -1,5 +1,8 @@
 import BadGatewayError from "../errors/bad-gateway.error.js";
 import BadRequestError from "../errors/bad-request.error.js";
+import db from "../config/database.js";
+import NotAuthorizedError from "../errors/not-authorized.error.js";
+import { criarLog } from "./log-app.service.js";
 
 const getPredictUrl = (baseUrl) => {
   return new URL("/predict", baseUrl).toString();
@@ -34,10 +37,54 @@ const fetchPrediction = async (url, predictionDTO) => {
   }
 };
 
-const predict = async (predictionDTO) => {
+const formatarPredicaoParaLog = (predicao) => {
+  return {
+    ...predicao,
+    data_hora_criacao: predicao.data_hora_criacao.toISOString(),
+  };
+};
+
+const persistirPredicao = async (
+  predictionDTO,
+  predictionResult,
+  { usuarioId, guestSessionId },
+) => {
+  return db.$transaction(async (tx) => {
+    const predicao = await tx.predicao.create({
+      data: {
+        ...predictionDTO,
+        id_usuario: usuarioId,
+        guest_session_id: guestSessionId,
+        aprovado: predictionResult.prediction === 1,
+        resultado_predicao: predictionResult,
+      },
+    });
+
+    await criarLog(tx, {
+      id_usuario: usuarioId,
+      tabela: "predicao",
+      id_tabela: predicao.id,
+      operacao: "INSERT",
+      depois: formatarPredicaoParaLog(predicao),
+    });
+
+    return predicao;
+  });
+};
+
+const predict = async (
+  predictionDTO,
+  { usuarioId = null, guestSessionId = null } = {},
+) => {
   let response;
   const baseUrl = process.env.STUDENT_APPROVAL_API_URL;
   let predictUrl;
+
+  if (!usuarioId && !guestSessionId) {
+    throw new NotAuthorizedError(
+      "Autenticação ou sessão de convidado não realizada",
+    );
+  }
 
   if (!baseUrl) {
     throw new BadGatewayError("URL do serviço de predição não configurada", {
@@ -88,6 +135,12 @@ const predict = async (predictionDTO) => {
   const responseBody = await parseResponseBody(response);
 
   if (response.ok) {
+    await persistirPredicao(
+      predictionDTO,
+      responseBody,
+      { usuarioId, guestSessionId },
+    );
+
     return responseBody;
   }
 
