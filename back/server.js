@@ -7,6 +7,7 @@ import authMiddleware from "./src/middlewares/auth.middleware.js";
 import corsMiddleware from "./src/middlewares/cors.middleware.js";
 import errorMiddleware from "./src/middlewares/error.middleware.js";
 import logMiddleware from "./src/middlewares/log.middleware.js";
+import guestMiddleware from "./src/middlewares/guest.middleware.js";
 import loadRoutes from "./src/routes/index.js";
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use(corsMiddleware);
 app.use(logMiddleware);
 app.use(authMiddleware);
+app.use(guestMiddleware);
 
 app.get("/health", (req, res) => {
   res.status(200).json({

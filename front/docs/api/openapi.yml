@@ -21,8 +21,9 @@ paths:
       security:
         - bearerAuth: []
         - cookieAuth: []
+        - guestSession: []
       summary: Predizer aprovacao de estudante
-      description: Valida os dados do estudante no backend, encaminha o payload para o servico Python student-approval em /predict e retorna a predicao calculada.
+      description: Valida os dados do estudante no backend, encaminha o payload para o servico Python student-approval em /predict e retorna a predicao calculada. Aceita usuario autenticado ou convidado identificado pelo header X-Guest-Session-Id.
       operationId: predictStudentApproval
       requestBody:
         required: true
@@ -96,7 +97,7 @@ paths:
                           message: Value must be an integer between 15 and 22.
                           received: 30
         "401":
-          description: Autenticacao nao realizada.
+          description: Autenticacao ou sessao de convidado nao realizada.
           content:
             application/json:
               schema:
@@ -104,7 +105,7 @@ paths:
               examples:
                 autenticacaoNaoRealizada:
                   value:
-                    error: Autenticação não realizada
+                    error: Autenticação ou sessão de convidado não realizada
         "502":
           description: Falha ao comunicar com o servico Python de predicao.
           content:
@@ -495,6 +496,11 @@ components:
       in: cookie
       name: token
       description: Token informado no cookie httpOnly `token`.
+    guestSession:
+      type: apiKey
+      in: header
+      name: X-Guest-Session-Id
+      description: UUID que identifica uma sessao visitante nas rotas que aceitam convidados.
   schemas:
     StudentApprovalPredictionRequest:
       type: object

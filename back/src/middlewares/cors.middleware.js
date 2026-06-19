@@ -1,6 +1,6 @@
 const ALLOWED_HOSTS = ["localhost", "127.0.0.1"];
 const ALLOWED_METHODS = "GET,POST,PUT,PATCH,DELETE,OPTIONS";
-const ALLOWED_HEADERS = "Content-Type,Authorization";
+const ALLOWED_HEADERS = "Content-Type,Authorization,X-Guest-Session-Id";
 
 const isAllowedOrigin = (origin) => {
   if (!origin) {

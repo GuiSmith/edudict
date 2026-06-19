@@ -7,6 +7,7 @@ const PUBLIC_ROUTES = [
   { method: 'POST', path: '/auth/login' },
   { method: 'POST', path: '/auth/logout' },
   { method: 'POST', path: '/usuarios' },
+  { method: "POST", path: "/predict" },
 ]
 
 const unauthorized = (res) => {
