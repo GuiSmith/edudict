@@ -16,6 +16,7 @@ const isPublicRoute = (pathname) => {
   return (
     pathname === "/" ||
     pathname === "/chat" ||
+    pathname === "/predicoes" ||
     pathname === "/docs/api" ||
     pathname.startsWith("/docs/wiki")
   );

@@ -1,4 +1,5 @@
 import ArticleIcon from "@mui/icons-material/Article";
+import AutoGraphIcon from "@mui/icons-material/AutoGraph";
 import ChatIcon from "@mui/icons-material/Chat";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -43,6 +44,12 @@ const mainNavItems = [
     href: "/",
     icon: HomeIcon,
     label: "Início",
+    type: "public",
+  },
+  {
+    href: "/predicoes",
+    icon: AutoGraphIcon,
+    label: "Predições",
     type: "public",
   },
 ];
