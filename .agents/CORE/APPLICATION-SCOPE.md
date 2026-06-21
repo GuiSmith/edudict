@@ -87,7 +87,7 @@ Regras:
 * O chat pode estar vinculado a uma predição.
 * Quando uma mensagem for enviada sem a identificação de um chat existente, o sistema deve criar um novo chat e persistir a mensagem nele.
 * Quando uma predição for informada na criação do chat, ela deve existir e pertencer ao mesmo usuário autenticado ou à mesma sessão visitante que está criando o chat.
-* O título do chat deve ser formado pelas primeiras 25 linhas da primeira mensagem enviada, respeitando o limite de armazenamento do título.
+* O título do chat deve ser formado pelos primeiros 25 caracteres da primeira mensagem enviada.
 * Ao criar o chat a partir de uma predição, o agente recebe o resultado bruto e o contexto permitido.
 * Criar uma predição não cria nem aciona um chat automaticamente.
 * O sistema deve permitir consultar o histórico de chats do usuário ou da sessão visitante.

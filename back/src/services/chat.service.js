@@ -7,8 +7,7 @@ import { criarLog } from "./log-app.service.js";
 
 const LIMITE_MENSAGENS_USUARIO = 10;
 const TAMANHO_MAXIMO_MENSAGEM_ASSISTENTE = 1000;
-const LIMITE_LINHAS_TITULO = 25;
-const TAMANHO_MAXIMO_TITULO = 200;
+const TAMANHO_MAXIMO_TITULO = 25;
 
 const formatarRegistroParaLog = (registro) => {
   return Object.fromEntries(
@@ -51,11 +50,7 @@ const montarFiltroProprietario = ({ usuarioId, guestSessionId }) => {
 };
 
 const montarTitulo = (content) => {
-  return content
-    .split(/\r?\n/)
-    .slice(0, LIMITE_LINHAS_TITULO)
-    .join("\n")
-    .slice(0, TAMANHO_MAXIMO_TITULO);
+  return content.slice(0, TAMANHO_MAXIMO_TITULO);
 };
 
 const montarContextoPredicao = (predicao) => {

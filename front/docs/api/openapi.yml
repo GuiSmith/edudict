@@ -645,9 +645,9 @@ components:
           example: 12
         titulo:
           type: string
-          maxLength: 200
-          description: Ate as primeiras 25 linhas da primeira mensagem.
-          example: Explique o resultado desta predição.
+          maxLength: 25
+          description: Primeiros 25 caracteres da primeira mensagem.
+          example: Explique o resultado dest
         data_hora_criacao:
           type: string
           format: date-time

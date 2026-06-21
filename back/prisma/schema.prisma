@@ -118,7 +118,7 @@ model chat {
   id_usuario            Int?
   guest_session_id      String?         @db.Uuid
   id_predicao           Int?
-  titulo                String?         @db.VarChar(200)
+  titulo                String?         @db.VarChar(25)
   data_hora_criacao     DateTime        @default(now()) @db.Timestamp(6)
   data_hora_atualizacao DateTime        @default(now()) @db.Timestamp(6)
   predicao              predicao?       @relation(fields: [id_predicao], references: [id], onDelete: NoAction, onUpdate: NoAction)
