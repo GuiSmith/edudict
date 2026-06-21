@@ -17,6 +17,7 @@ const blocks = [
       "Não deve guardar sucesso, falha, motivo de rejeição, status HTTP ou contexto de requisição.",
       "No login e logout, a entidade auditada é token.",
       "Na criação e edição de usuário, a entidade auditada é usuario.",
+      "Na criação de uma predição, a entidade auditada é predicao e o resultado completo fica disponível no campo depois.",
     ],
   },
   {
@@ -26,6 +27,8 @@ const blocks = [
       "Para auditar criação ou inativação de token, consulte log_app filtrando tabela token.",
       "Para auditar criação de usuário, consulte log_app filtrando tabela usuario e operação INSERT.",
       "Para auditar edição de usuário, consulte log_app filtrando tabela usuario e operação UPDATE.",
+      "Para auditar uma predição, consulte log_app filtrando tabela predicao e operação INSERT.",
+      "Quando a explicabilidade estiver disponível, ela aparece dentro de resultado_predicao.explanation no registro persistido.",
     ],
   },
 ];

@@ -9,11 +9,13 @@ import Head from "next/head";
 import { useMemo, useState } from "react";
 
 import CriarUsuarioTab from "@/components/wiki/CriarUsuarioTab";
+import ChatAgenteTab from "@/components/wiki/ChatAgenteTab";
 import EditarUsuarioTab from "@/components/wiki/EditarUsuarioTab";
 import FuncionalidadesPrevistasTab from "@/components/wiki/FuncionalidadesPrevistasTab";
 import LoginTab from "@/components/wiki/LoginTab";
 import LogoutTab from "@/components/wiki/LogoutTab";
 import LogsSuporteTab from "@/components/wiki/LogsSuporteTab";
+import PredicoesTab from "@/components/wiki/PredicoesTab";
 import VisaoGeralTab from "@/components/wiki/VisaoGeralTab";
 
 const wikiTabs = [
@@ -21,6 +23,16 @@ const wikiTabs = [
     id: "visao-geral",
     label: "Visão geral",
     Component: VisaoGeralTab,
+  },
+  {
+    id: "predicoes",
+    label: "Predições",
+    Component: PredicoesTab,
+  },
+  {
+    id: "chat-agente",
+    label: "Chat e agente",
+    Component: ChatAgenteTab,
   },
   {
     id: "login",
@@ -118,8 +130,8 @@ export default function WikiPage() {
                 Wiki do sistema
               </Typography>
               <Typography color="text.secondary" variant="body1">
-                Fluxos implementados para autenticação e usuários, descritos
-                para operação, suporte e manutenção.
+                Fluxos implementados para predições, explicabilidade, chats,
+                autenticação e usuários, descritos para operação e suporte.
               </Typography>
             </Stack>
           </Box>

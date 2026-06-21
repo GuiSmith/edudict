@@ -4,6 +4,11 @@ const blocks = [
   {
     title: "O que está implementado",
     items: [
+      "Predições acadêmicas para usuários autenticados e visitantes, com formulário em etapas e histórico individual.",
+      "Integração com uma API Python que retorna resultado, probabilidades e explicabilidade local SHAP.",
+      "Persistência da resposta completa da predição, incluindo os fatores SHAP quando disponíveis.",
+      "Chats vinculados opcionalmente a predições, com histórico de mensagens e interpretação pelo agente inteligente.",
+      "Contexto controlado para que o agente use fatores locais sem inventar justificativas ou afirmar causalidade.",
       "Login por CPF ou e-mail, com criação de token persistido no banco.",
       "Logout com inativação do token utilizado na autenticação.",
       "Criação de usuário autenticada, com validação estrutural e registro em log_app.",
@@ -24,7 +29,7 @@ export default function VisaoGeralTab() {
   return (
     <WikiTabContent
       blocks={blocks}
-      description="Esta página documenta os fluxos de autenticação e usuários que já existem no código atual da aplicação."
+      description="Esta página documenta os módulos disponíveis no EduDict, desde a geração da predição até sua interpretação no chat."
       title="Wiki funcional do edudict"
     />
   );

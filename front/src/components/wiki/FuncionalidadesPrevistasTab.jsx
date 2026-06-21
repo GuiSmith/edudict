@@ -2,25 +2,18 @@ import WikiTabContent from "./WikiTabContent";
 
 const blocks = [
   {
-    title: "Usuários",
+    title: "Gestão administrativa de usuários",
     items: [
-      "A documentação central prevê listagem, edição, inativação, associação a almoxarifados e controle de permissões.",
-      "No código atual, os endpoints de usuários implementados são criação via POST /usuarios e edição via PUT /usuarios.",
-      "Listagem, inativação dedicada, associação a almoxarifados e controle de permissões ainda aparecem como previstos.",
+      "Ainda não existe uma rota ou tela para listar todos os usuários.",
+      "Ainda não existe uma ação dedicada de inativação; o campo ativo pode ser alterado somente pelo fluxo geral de edição.",
+      "O sistema ainda não possui perfis de permissão ou papéis de acesso.",
     ],
   },
   {
-    title: "Autenticação",
+    title: "Visualização da explicabilidade",
     items: [
-      "A documentação central cita verificação de usuário autenticado e rotas como /auth/me.",
-      "No código atual, as rotas implementadas de autenticação são POST /auth/login e POST /auth/logout.",
-    ],
-  },
-  {
-    title: "Interface",
-    items: [
-      "A wiki usa Material UI, conforme a documentação central do front-end.",
-      "Os demais módulos previstos ainda não possuem páginas ou endpoints implementados no código atual.",
+      "Ainda não existe uma seção visual na tela de detalhes para mostrar diretamente ao usuário os fatores SHAP.",
+      "Atualmente, os fatores são persistidos e usados pelo agente durante a análise no chat.",
     ],
   },
 ];
@@ -29,7 +22,7 @@ export default function FuncionalidadesPrevistasTab() {
   return (
     <WikiTabContent
       blocks={blocks}
-      description="A documentação central descreve módulos que ainda não aparecem implementados no código atual."
+      description="Esta seção separa melhorias ainda não disponíveis das funcionalidades que já podem ser utilizadas."
       title="Funcionalidades previstas"
     />
   );
