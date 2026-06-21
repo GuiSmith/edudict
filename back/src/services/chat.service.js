@@ -257,6 +257,59 @@ const criarMensagem = async (
   });
 };
 
+const listarChats = async (
+  { usuarioId = null, guestSessionId = null } = {},
+) => {
+  const proprietario = montarFiltroProprietario({
+    usuarioId,
+    guestSessionId,
+  });
+
+  return db.chat.findMany({
+    where: proprietario,
+    orderBy: {
+      data_hora_atualizacao: "desc",
+    },
+  });
+};
+
+const listarMensagens = async (
+  idChat,
+  { usuarioId = null, guestSessionId = null } = {},
+) => {
+  const proprietario = montarFiltroProprietario({
+    usuarioId,
+    guestSessionId,
+  });
+  const chat = await db.chat.findFirst({
+    where: {
+      id: idChat,
+      ...proprietario,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!chat) {
+    throw new NotFoundError("Chat não encontrado");
+  }
+
+  return db.chat_mensagem.findMany({
+    where: {
+      id_chat: idChat,
+    },
+    orderBy: [
+      {
+        data_hora: "asc",
+      },
+      {
+        id: "asc",
+      },
+    ],
+  });
+};
+
 export {
   LIMITE_MENSAGENS_USUARIO,
   TAMANHO_MAXIMO_MENSAGEM_ASSISTENTE,
@@ -264,4 +317,6 @@ export {
 
 export default {
   criarMensagem,
+  listarChats,
+  listarMensagens,
 };

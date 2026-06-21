@@ -5,6 +5,7 @@ import asyncHandler from "../middlewares/async-handler.middleware.js";
 
 const router = Router();
 
+router.get("/", asyncHandler(mensagensController.listarMensagens));
 router.post("/", asyncHandler(mensagensController.criarMensagem));
 
 export default router;

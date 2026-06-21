@@ -1,4 +1,5 @@
 import criarMensagemDTO from "../dtos/mensagem/criar-mensagem.dto.js";
+import listarMensagensDTO from "../dtos/mensagem/listar-mensagens.dto.js";
 import chatService from "../services/chat.service.js";
 
 const criarMensagem = async (req, res) => {
@@ -11,6 +12,17 @@ const criarMensagem = async (req, res) => {
   return res.status(201).json(resultado);
 };
 
+const listarMensagens = async (req, res) => {
+  const { idChat } = listarMensagensDTO(req.query);
+  const mensagens = await chatService.listarMensagens(idChat, {
+    usuarioId: req.user?.id ?? null,
+    guestSessionId: req.guest_session_id ?? null,
+  });
+
+  return res.status(200).json(mensagens);
+};
+
 export default {
   criarMensagem,
+  listarMensagens,
 };
