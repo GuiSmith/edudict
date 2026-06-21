@@ -13,6 +13,8 @@ tags:
     description: Predicao de aprovacao de estudante.
   - name: Mensagens
     description: Envio de mensagens e interacao com o agente do chat.
+  - name: Chats
+    description: Consulta do histórico de chats.
   - name: Usuarios
     description: Gerenciamento de usuarios.
 paths:
@@ -131,7 +133,90 @@ paths:
                 erroInterno:
                   value:
                     error: Erro interno do servidor
+  /chats:
+    get:
+      tags:
+        - Chats
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+        - guestSession: []
+      summary: Listar chats
+      description: Lista todos os chats pertencentes ao usuário autenticado ou à sessão visitante, ordenados pela atualização mais recente.
+      operationId: listarChats
+      responses:
+        "200":
+          description: Chats do proprietário.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Chat"
+        "401":
+          description: Autenticacao ou sessao de convidado nao realizada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Erro inesperado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /mensagens:
+    get:
+      tags:
+        - Mensagens
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+        - guestSession: []
+      summary: Listar mensagens de um chat
+      description: Lista em ordem cronológica as mensagens de um chat pertencente ao usuário autenticado ou à sessão visitante.
+      operationId: listarMensagens
+      parameters:
+        - in: query
+          name: id_chat
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Identificador do chat.
+      responses:
+        "200":
+          description: Mensagens do chat.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MensagemChat"
+        "400":
+          description: Identificador do chat ausente ou inválido.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Autenticacao ou sessao de convidado nao realizada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Chat inexistente para o proprietário.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Erro inesperado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     post:
       tags:
         - Mensagens
