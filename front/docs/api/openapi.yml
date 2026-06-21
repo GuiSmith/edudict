@@ -19,6 +19,37 @@ tags:
     description: Gerenciamento de usuarios.
 paths:
   /predict:
+    get:
+      tags:
+        - Predict
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+        - guestSession: []
+      summary: Listar predições
+      description: Lista as predições do usuário autenticado ou da sessão visitante, da mais recente para a mais antiga.
+      operationId: listStudentApprovalPredictions
+      responses:
+        "200":
+          description: Histórico de predições do proprietário atual.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StudentApprovalPredictionHistoryItem"
+        "401":
+          description: Autenticação ou sessão de convidado não realizada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Erro inesperado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     post:
       tags:
         - Predict
@@ -81,10 +112,10 @@ paths:
                   value:
                     success: true
                     prediction: 1
-                    label: approved
+                    label: Aprovado
                     probabilities:
-                      approved: 0.82
-                      not_approved: 0.18
+                      Aprovado: 0.82
+                      Reprovado: 0.18
         "400":
           description: Payload invalido no backend ou recusado pelo servico de predicao.
           content:
@@ -933,15 +964,50 @@ components:
           example: 1
         label:
           type: string
-          example: approved
+          example: Aprovado
         probabilities:
           type: object
           additionalProperties:
             type: number
             format: float
           example:
-            approved: 0.82
-            not_approved: 0.18
+            Aprovado: 0.82
+            Reprovado: 0.18
+    StudentApprovalPredictionHistoryItem:
+      allOf:
+        - $ref: "#/components/schemas/StudentApprovalPredictionRequest"
+        - type: object
+          required:
+            - id
+            - aprovado
+            - resultado_predicao
+            - data_hora_criacao
+          properties:
+            id:
+              type: integer
+              example: 12
+            id_usuario:
+              type:
+                - integer
+                - "null"
+              example: 3
+            guest_session_id:
+              type:
+                - string
+                - "null"
+              format: uuid
+            aprovado:
+              type: boolean
+              example: true
+            resultado_predicao:
+              $ref: "#/components/schemas/StudentApprovalPredictionResponse"
+            interpretacao_llm:
+              type:
+                - string
+                - "null"
+            data_hora_criacao:
+              type: string
+              format: date-time
     LoginRequest:
       type: object
       additionalProperties: true
