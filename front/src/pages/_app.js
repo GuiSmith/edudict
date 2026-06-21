@@ -13,7 +13,12 @@ import { AppThemeProvider } from "@/contexts/ThemeContext";
 const MAIN_ROUTE = "/";
 
 const isPublicRoute = (pathname) => {
-  return pathname === "/" || pathname === "/docs/api" || pathname.startsWith("/docs/wiki");
+  return (
+    pathname === "/" ||
+    pathname === "/chat" ||
+    pathname === "/docs/api" ||
+    pathname.startsWith("/docs/wiki")
+  );
 };
 
 const isGuestOnlyRoute = (pathname) => {

@@ -1,6 +1,9 @@
 import ArticleIcon from "@mui/icons-material/Article";
+import ChatIcon from "@mui/icons-material/Chat";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import HomeIcon from "@mui/icons-material/Home";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -23,28 +26,32 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useThemeContext } from "@/contexts/ThemeContext";
+import authAxios from "@/utils/authAxios";
 
 const NAVBAR_EXPANDED_WIDTH = 248;
 const NAVBAR_COLLAPSED_WIDTH = 72;
 const NAVBAR_COLLAPSED_STORAGE_KEY = "edudict-navbar-collapsed";
 const NAVBAR_COLLAPSED_CHANGE_EVENT = "edudict-navbar-collapsed-change";
+const CHATS_CHANGE_EVENT = "edudict-chats-change";
 
-const navItems = [
-  {
-    href: "/perfil",
-    icon: PersonIcon,
-    label: "Perfil",
-    type: "private",
-    usesAvatar: true,
-  },
+const mainNavItems = [
   {
     href: "/",
     icon: HomeIcon,
     label: "Início",
+    type: "public",
+  },
+];
+
+const documentationNavItems = [
+  {
+    href: "/docs/wiki",
+    icon: ArticleIcon,
+    label: "Wiki",
     type: "public",
   },
   {
@@ -53,11 +60,15 @@ const navItems = [
     label: "API",
     type: "public",
   },
+];
+
+const accountNavItems = [
   {
-    href: "/docs/wiki",
-    icon: ArticleIcon,
-    label: "Wiki",
-    type: "public",
+    href: "/perfil",
+    icon: PersonIcon,
+    label: "Perfil",
+    type: "private",
+    usesAvatar: true,
   },
   {
     href: "/login",
@@ -174,9 +185,46 @@ function NavbarItem({ collapsed, item, mobile, onNavigate, usuario }) {
 }
 
 function NavbarContent({ collapsed, mobile, onClose, onToggleCollapse }) {
+  const router = useRouter();
   const { estaAutenticado, usuario } = useAuth();
   const { mode, toggleTheme } = useThemeContext();
-  const visibleItems = getVisibleItems(navItems, estaAutenticado);
+  const [chats, setChats] = useState([]);
+  const [chatsExpanded, setChatsExpanded] = useState(true);
+  const visibleAccountItems = getVisibleItems(
+    accountNavItems,
+    estaAutenticado
+  );
+
+  const loadChats = useCallback(async () => {
+    try {
+      const response = await authAxios.get("/chats");
+      setChats(Array.isArray(response.data) ? response.data : []);
+    } catch {
+      setChats([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const initialLoad = window.setTimeout(loadChats, 0);
+    window.addEventListener(CHATS_CHANGE_EVENT, loadChats);
+
+    return () => {
+      window.clearTimeout(initialLoad);
+      window.removeEventListener(CHATS_CHANGE_EVENT, loadChats);
+    };
+  }, [estaAutenticado, loadChats]);
+
+  const navigateToChat = (href) => {
+    router.push(href);
+
+    if (mobile) {
+      onClose();
+    }
+  };
 
   return (
     <Box
@@ -217,7 +265,134 @@ function NavbarContent({ collapsed, mobile, onClose, onToggleCollapse }) {
       <Divider />
 
       <List sx={{ flex: 1, overflowX: "hidden", px: 1, py: 1.5 }}>
-        {visibleItems.map((item) => (
+        {mainNavItems.map((item) => (
+          <NavbarItem
+            collapsed={collapsed}
+            item={item}
+            key={item.href}
+            mobile={mobile}
+            onNavigate={mobile ? onClose : undefined}
+            usuario={usuario}
+          />
+        ))}
+
+        <Tooltip
+          disableHoverListener={!collapsed || mobile}
+          placement="right"
+          title="Novo Chat"
+        >
+          <ListItemButton
+            onClick={() => navigateToChat("/chat")}
+            selected={router.pathname === "/chat" && !router.query.id}
+            sx={{
+              borderLeft: "4px solid",
+              borderLeftColor:
+                router.pathname === "/chat" && !router.query.id
+                  ? "primary.main"
+                  : "transparent",
+              borderRadius: 1,
+              boxSizing: "border-box",
+              justifyContent: collapsed && !mobile ? "center" : "flex-start",
+              minHeight: 44,
+              overflowX: "hidden",
+              px: collapsed && !mobile ? 1 : 1.5,
+              width: "100%",
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                color:
+                  router.pathname === "/chat" && !router.query.id
+                    ? "primary.main"
+                    : "text.secondary",
+                justifyContent: "center",
+                minWidth: collapsed && !mobile ? 0 : 42,
+              }}
+            >
+              <EditOutlinedIcon fontSize="small" />
+            </ListItemIcon>
+            {collapsed && !mobile ? null : (
+              <>
+                <ListItemText primary="Novo Chat" sx={{ minWidth: 0 }} />
+                <IconButton
+                  aria-label={
+                    chatsExpanded ? "Recolher chats" : "Expandir chats"
+                  }
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setChatsExpanded((current) => !current);
+                  }}
+                  size="small"
+                >
+                  <ChevronRightIcon
+                    fontSize="small"
+                    sx={{
+                      transform: chatsExpanded
+                        ? "rotate(90deg)"
+                        : "rotate(0deg)",
+                      transition: "transform 160ms ease",
+                    }}
+                  />
+                </IconButton>
+              </>
+            )}
+          </ListItemButton>
+        </Tooltip>
+
+        {(!collapsed || mobile) && chatsExpanded ? (
+          <List
+            aria-label="Histórico de chats"
+            disablePadding
+            sx={{ mb: 1, ml: 1.5, mt: 0.5 }}
+          >
+            {chats.map((chat) => (
+              <ListItemButton
+                key={chat.id}
+                onClick={() => navigateToChat(`/chat?id=${chat.id}`)}
+                selected={
+                  router.pathname === "/chat" &&
+                  String(router.query.id) === String(chat.id)
+                }
+                sx={{
+                  borderRadius: 1,
+                  minHeight: 38,
+                  pl: 1.25,
+                  pr: 1,
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: 34 }}>
+                  <ChatIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={chat.titulo || "Chat sem título"}
+                  slotProps={{
+                    primary: {
+                      fontSize: 13,
+                      noWrap: true,
+                    },
+                  }}
+                />
+              </ListItemButton>
+            ))}
+          </List>
+        ) : null}
+
+        <Divider sx={{ my: 1 }} />
+
+        {documentationNavItems.map((item) => (
+          <NavbarItem
+            collapsed={collapsed}
+            item={item}
+            key={item.href}
+            mobile={mobile}
+            onNavigate={mobile ? onClose : undefined}
+            usuario={usuario}
+          />
+        ))}
+
+        <Divider sx={{ my: 1 }} />
+
+        {visibleAccountItems.map((item) => (
           <NavbarItem
             collapsed={collapsed}
             item={item}
