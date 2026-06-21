@@ -103,7 +103,7 @@ export default function PerfilPage() {
         <title>Perfil | edudict</title>
       </Head>
 
-      <Box sx={{ p: { md: 4, xs: 8 } }}>
+      <Box sx={{ p: { md: 4, xs: 2 } }}>
         <Paper
           elevation={0}
           sx={{
@@ -117,12 +117,17 @@ export default function PerfilPage() {
             <Typography component="h1" variant="h5">
               Perfil
             </Typography>
-            <Stack spacing={0.75}>
+            <Stack spacing={0.75} sx={{ minWidth: 0 }}>
               <Typography color="text.secondary">
                 {usuario?.nome || "Usuário autenticado"}
               </Typography>
               {usuario?.email ? (
-                <Typography color="text.secondary">{usuario.email}</Typography>
+                <Typography
+                  color="text.secondary"
+                  sx={{ overflowWrap: "anywhere" }}
+                >
+                  {usuario.email}
+                </Typography>
               ) : null}
             </Stack>
             <Button

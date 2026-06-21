@@ -343,7 +343,7 @@ function NavbarContent({ collapsed, mobile, onClose, onToggleCollapse }) {
           <List
             aria-label="Histórico de chats"
             disablePadding
-            sx={{ mb: 1, ml: 1.5, mt: 0.5 }}
+            sx={{ mb: 1, ml: 3, mt: 0.5 }}
           >
             {chats.map((chat) => (
               <ListItemButton
