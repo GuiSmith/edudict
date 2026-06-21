@@ -11,6 +11,8 @@ tags:
     description: Autenticacao de usuarios.
   - name: Predict
     description: Predicao de aprovacao de estudante.
+  - name: Mensagens
+    description: Envio de mensagens e interacao com o agente do chat.
   - name: Usuarios
     description: Gerenciamento de usuarios.
 paths:
@@ -129,6 +131,85 @@ paths:
                 erroInterno:
                   value:
                     error: Erro interno do servidor
+  /mensagens:
+    post:
+      tags:
+        - Mensagens
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+        - guestSession: []
+      summary: Enviar mensagem para um chat
+      description: >
+        Envia uma mensagem de usuario ao agente. Quando id_chat nao for
+        informado, cria um chat associado ao usuario autenticado ou a sessao
+        visitante. Se id_predicao for informado, a predição precisa existir e
+        pertencer ao mesmo proprietario. Cada chat aceita no maximo 10
+        mensagens de usuario.
+      operationId: criarMensagem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CriarMensagemRequest"
+            examples:
+              novoChat:
+                value:
+                  id_predicao: 12
+                  content: Explique o resultado desta predição.
+              chatExistente:
+                value:
+                  id_chat: 7
+                  content: Quais variáveis mais ajudam a interpretar o resultado?
+      responses:
+        "201":
+          description: Mensagem do usuario e resposta do agente persistidas.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CriarMensagemResponse"
+        "400":
+          description: Payload invalido ou limite de mensagens atingido.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                limiteAtingido:
+                  value:
+                    error: O limite é de 10 mensagens por chat
+                mensagemMuitoLonga:
+                  value:
+                    error: A mensagem do usuário deve ter no máximo 500 caracteres
+                    details:
+                      fields:
+                        - content
+                      maximum: 500
+        "401":
+          description: Autenticacao ou sessao de convidado nao realizada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Chat ou predicao inexistente para o proprietario.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Falha ao comunicar com o servico da OpenAI.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Erro inesperado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /auth/me:
     get:
       tags:
@@ -502,6 +583,111 @@ components:
       name: X-Guest-Session-Id
       description: UUID que identifica uma sessao visitante nas rotas que aceitam convidados.
   schemas:
+    CriarMensagemRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - content
+      properties:
+        id_chat:
+          type: integer
+          minimum: 1
+          description: Chat existente. Quando omitido, um novo chat sera criado.
+          example: 7
+        id_predicao:
+          type: integer
+          minimum: 1
+          description: Predicao do mesmo usuario ou sessao visitante.
+          example: 12
+        content:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: Explique o resultado desta predição.
+    CriarMensagemResponse:
+      type: object
+      required:
+        - chat
+        - mensagemUsuario
+        - mensagemAssistente
+      properties:
+        chat:
+          $ref: "#/components/schemas/Chat"
+        mensagemUsuario:
+          $ref: "#/components/schemas/MensagemChat"
+        mensagemAssistente:
+          $ref: "#/components/schemas/MensagemChat"
+    Chat:
+      type: object
+      required:
+        - id
+        - titulo
+        - data_hora_criacao
+        - data_hora_atualizacao
+      properties:
+        id:
+          type: integer
+          example: 7
+        id_usuario:
+          type:
+            - integer
+            - "null"
+          example: 3
+        guest_session_id:
+          type:
+            - string
+            - "null"
+          format: uuid
+        id_predicao:
+          type:
+            - integer
+            - "null"
+          example: 12
+        titulo:
+          type: string
+          maxLength: 200
+          description: Ate as primeiras 25 linhas da primeira mensagem.
+          example: Explique o resultado desta predição.
+        data_hora_criacao:
+          type: string
+          format: date-time
+        data_hora_atualizacao:
+          type: string
+          format: date-time
+    MensagemChat:
+      type: object
+      required:
+        - id
+        - id_chat
+        - role
+        - content
+        - data_hora
+      properties:
+        id:
+          type: integer
+          example: 21
+        id_chat:
+          type: integer
+          example: 7
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+          maxLength: 1000
+        tokens_prompt:
+          type:
+            - integer
+            - "null"
+          example: 1520
+        tokens_completion:
+          type:
+            - integer
+            - "null"
+          example: 180
+        data_hora:
+          type: string
+          format: date-time
     StudentApprovalPredictionRequest:
       type: object
       additionalProperties: false

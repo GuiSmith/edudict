@@ -85,6 +85,9 @@ Regras:
 
 * O chat deve pertencer a um usuário autenticado ou a uma sessão visitante.
 * O chat pode estar vinculado a uma predição.
+* Quando uma mensagem for enviada sem a identificação de um chat existente, o sistema deve criar um novo chat e persistir a mensagem nele.
+* Quando uma predição for informada na criação do chat, ela deve existir e pertencer ao mesmo usuário autenticado ou à mesma sessão visitante que está criando o chat.
+* O título do chat deve ser formado pelas primeiras 25 linhas da primeira mensagem enviada, respeitando o limite de armazenamento do título.
 * Ao criar o chat a partir de uma predição, o agente recebe o resultado bruto e o contexto permitido.
 * Criar uma predição não cria nem aciona um chat automaticamente.
 * O sistema deve permitir consultar o histórico de chats do usuário ou da sessão visitante.
@@ -96,7 +99,11 @@ Uma mensagem representa uma interação dentro de um chat.
 * Cada mensagem pertence a apenas um chat.
 * Um chat pode possuir uma ou várias mensagens.
 * A origem da mensagem pode ser o usuário, o agente ou o sistema, quando necessário.
+* Cada chat pode receber no máximo 10 mensagens com origem no usuário.
+* Uma mensagem do usuário pode possuir no máximo 500 caracteres.
+* Uma mensagem do agente pode possuir no máximo 1.000 caracteres.
 * Mensagens do usuário e respostas do agente devem ser persistidas.
+* O consumo de tokens informado pelo serviço do agente deve ser persistido junto à resposta, quando estiver disponível.
 * O sistema deve permitir listar as mensagens de um chat respeitando seu proprietário.
 
 ### Agente inteligente
