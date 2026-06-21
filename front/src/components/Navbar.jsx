@@ -46,6 +46,9 @@ const mainNavItems = [
     label: "Início",
     type: "public",
   },
+];
+
+const predictionNavItems = [
   {
     href: "/predicoes",
     icon: AutoGraphIcon,
@@ -283,6 +286,43 @@ function NavbarContent({ collapsed, mobile, onClose, onToggleCollapse }) {
           />
         ))}
 
+        {visibleAccountItems.map((item) => (
+          <NavbarItem
+            collapsed={collapsed}
+            item={item}
+            key={item.href}
+            mobile={mobile}
+            onNavigate={mobile ? onClose : undefined}
+            usuario={usuario}
+          />
+        ))}
+
+        <Divider sx={{ my: 1 }} />
+
+        {documentationNavItems.map((item) => (
+          <NavbarItem
+            collapsed={collapsed}
+            item={item}
+            key={item.href}
+            mobile={mobile}
+            onNavigate={mobile ? onClose : undefined}
+            usuario={usuario}
+          />
+        ))}
+
+        <Divider sx={{ my: 1 }} />
+
+        {predictionNavItems.map((item) => (
+          <NavbarItem
+            collapsed={collapsed}
+            item={item}
+            key={item.href}
+            mobile={mobile}
+            onNavigate={mobile ? onClose : undefined}
+            usuario={usuario}
+          />
+        ))}
+
         <Tooltip
           disableHoverListener={!collapsed || mobile}
           placement="right"
@@ -383,32 +423,6 @@ function NavbarContent({ collapsed, mobile, onClose, onToggleCollapse }) {
             ))}
           </List>
         ) : null}
-
-        <Divider sx={{ my: 1 }} />
-
-        {documentationNavItems.map((item) => (
-          <NavbarItem
-            collapsed={collapsed}
-            item={item}
-            key={item.href}
-            mobile={mobile}
-            onNavigate={mobile ? onClose : undefined}
-            usuario={usuario}
-          />
-        ))}
-
-        <Divider sx={{ my: 1 }} />
-
-        {visibleAccountItems.map((item) => (
-          <NavbarItem
-            collapsed={collapsed}
-            item={item}
-            key={item.href}
-            mobile={mobile}
-            onNavigate={mobile ? onClose : undefined}
-            usuario={usuario}
-          />
-        ))}
       </List>
 
       <Divider />
