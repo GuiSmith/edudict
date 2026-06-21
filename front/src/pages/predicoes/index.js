@@ -1,5 +1,6 @@
 import AddIcon from "@mui/icons-material/Add";
 import AutoGraphIcon from "@mui/icons-material/AutoGraph";
+import ForumIcon from "@mui/icons-material/Forum";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -9,6 +10,7 @@ import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -42,6 +44,7 @@ const getApprovalProbability = (prediction) => {
 };
 
 export default function PredictionsPage() {
+  const router = useRouter();
   const [predictions, setPredictions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -211,13 +214,34 @@ export default function PredictionsPage() {
                     {formatDateTime(prediction.data_hora_criacao)}
                   </Typography>
 
-                  <Button
-                    onClick={() => setSelectedPrediction(prediction)}
-                    startIcon={<VisibilityIcon />}
-                    variant="outlined"
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{ "& > *": { flex: 1 } }}
                   >
-                    Visualizar predição
-                  </Button>
+                    <Button
+                      onClick={() => setSelectedPrediction(prediction)}
+                      startIcon={<VisibilityIcon />}
+                      variant="outlined"
+                    >
+                      Visualizar
+                    </Button>
+                    <Button
+                      onClick={() =>
+                        router.push({
+                          pathname: "/chat",
+                          query: {
+                            id_predicao: prediction.id,
+                            mensagem: `Analise a predição #${prediction.id} e explique o resultado.`,
+                          },
+                        })
+                      }
+                      startIcon={<ForumIcon />}
+                      variant="contained"
+                    >
+                      Analisar
+                    </Button>
+                  </Stack>
                 </Paper>
               );
             })}

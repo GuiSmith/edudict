@@ -9,7 +9,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 import authAxios from "@/utils/authAxios";
@@ -20,6 +20,7 @@ const CHATS_CHANGE_EVENT = "edudict-chats-change";
 
 export default function ChatPage() {
   const router = useRouter();
+  const automaticSendRef = useRef(null);
   const messagesEndRef = useRef(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -28,6 +29,12 @@ export default function ChatPage() {
   const chatId = Array.isArray(router.query.id)
     ? router.query.id[0]
     : router.query.id;
+  const predictionId = Array.isArray(router.query.id_predicao)
+    ? router.query.id_predicao[0]
+    : router.query.id_predicao;
+  const initialMessage = Array.isArray(router.query.mensagem)
+    ? router.query.mensagem[0]
+    : router.query.mensagem;
 
   useEffect(() => {
     if (!router.isReady) {
@@ -35,10 +42,13 @@ export default function ChatPage() {
     }
 
     if (!chatId) {
-      const clearMessages = window.setTimeout(() => setMessages([]), 0);
+      const prepareNewChat = window.setTimeout(() => {
+        setMessages([]);
+        setMessage(initialMessage || "");
+      }, 0);
 
       return () => {
-        window.clearTimeout(clearMessages);
+        window.clearTimeout(prepareNewChat);
       };
     }
 
@@ -70,13 +80,13 @@ export default function ChatPage() {
       active = false;
       window.clearTimeout(showLoading);
     };
-  }, [chatId, router]);
+  }, [chatId, initialMessage, router]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = async () => {
+  const handleSend = useCallback(async () => {
     const content = message.trim();
 
     if (!content || isSending) {
@@ -88,6 +98,9 @@ export default function ChatPage() {
     try {
       const response = await authAxios.post("/mensagens", {
         ...(chatId ? { id_chat: Number(chatId) } : {}),
+        ...(!chatId && predictionId
+          ? { id_predicao: Number(predictionId) }
+          : {}),
         content,
       });
       const createdChatId = response.data?.chat?.id;
@@ -112,7 +125,39 @@ export default function ChatPage() {
     } finally {
       setIsSending(false);
     }
-  };
+  }, [chatId, isSending, message, predictionId, router]);
+
+  useEffect(() => {
+    if (
+      !router.isReady ||
+      chatId ||
+      !predictionId ||
+      !initialMessage ||
+      message !== initialMessage
+    ) {
+      return undefined;
+    }
+
+    const automaticSendKey = `${predictionId}:${initialMessage}`;
+
+    if (automaticSendRef.current === automaticSendKey) {
+      return undefined;
+    }
+
+    automaticSendRef.current = automaticSendKey;
+    const automaticSend = window.setTimeout(handleSend, 0);
+
+    return () => {
+      window.clearTimeout(automaticSend);
+    };
+  }, [
+    chatId,
+    handleSend,
+    initialMessage,
+    message,
+    predictionId,
+    router.isReady,
+  ]);
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
