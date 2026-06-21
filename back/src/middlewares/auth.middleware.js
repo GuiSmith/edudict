@@ -10,6 +10,7 @@ const PUBLIC_ROUTES = [
 ]
 const OPTIONAL_AUTH_ROUTES = [
   { method: "POST", path: "/predict" },
+  { method: "POST", path: "/mensagens" },
 ];
 
 const unauthorized = (res) => {

@@ -253,6 +253,18 @@ const extrairTextoResposta = (responseBody) => {
     : EMPTY_RESPONSE_MESSAGE;
 };
 
+const extrairTokensResposta = (responseBody) => {
+  const tokensPrompt = Number(responseBody?.usage?.input_tokens);
+  const tokensCompletion = Number(responseBody?.usage?.output_tokens);
+
+  return {
+    tokensPrompt: Number.isInteger(tokensPrompt) ? tokensPrompt : null,
+    tokensCompletion: Number.isInteger(tokensCompletion)
+      ? tokensCompletion
+      : null,
+  };
+};
+
 const lerRespostaOpenAi = async (response) => {
   try {
     return await response.json();
@@ -318,13 +330,17 @@ const criarResposta = async (userContent, payload = {}, historico = []) => {
     });
   }
 
-  return extrairTextoResposta(responseBody);
+  return {
+    content: extrairTextoResposta(responseBody),
+    ...extrairTokensResposta(responseBody),
+  };
 };
 
 export default {
   contextos,
   criarResposta,
   extrairTextoResposta,
+  extrairTokensResposta,
   montarDevContent,
   normalizarHistorico,
 };
