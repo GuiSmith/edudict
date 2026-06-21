@@ -10,6 +10,7 @@ const PUBLIC_ROUTES = [
 ]
 const OPTIONAL_AUTH_ROUTES = [
   { method: "POST", path: "/predict" },
+  { method: "GET", path: "/predict" },
   { method: "GET", path: "/chats" },
   { method: "GET", path: "/mensagens" },
   { method: "POST", path: "/mensagens" },

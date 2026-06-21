@@ -44,6 +44,31 @@ const formatarPredicaoParaLog = (predicao) => {
   };
 };
 
+const listar = async (
+  { usuarioId = null, guestSessionId = null } = {},
+) => {
+  if (!usuarioId && !guestSessionId) {
+    throw new NotAuthorizedError(
+      "Autenticação ou sessão de convidado não realizada",
+    );
+  }
+
+  return db.predicao.findMany({
+    where: usuarioId
+      ? {
+          id_usuario: usuarioId,
+          guest_session_id: null,
+        }
+      : {
+          id_usuario: null,
+          guest_session_id: guestSessionId,
+        },
+    orderBy: {
+      data_hora_criacao: "desc",
+    },
+  });
+};
+
 const persistirPredicao = async (
   predictionDTO,
   predictionResult,
@@ -160,5 +185,6 @@ const predict = async (
 };
 
 export default {
+  listar,
   predict,
 };
