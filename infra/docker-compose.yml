@@ -37,6 +37,7 @@ services:
       retries: 5
     networks:
       - edudict-network
+      - student-approval-network
 
   edudict-front:
     build:
@@ -60,3 +61,6 @@ volumes:
 networks:
   edudict-network:
     driver: bridge
+  student-approval-network:
+    external: true
+    name: student-approval-network

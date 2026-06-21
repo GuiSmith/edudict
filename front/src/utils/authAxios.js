@@ -24,7 +24,7 @@ const getGuestSessionId = () => {
 };
 
 const authAxios = axios.create({
-  baseURL: "http://localhost:3011",
+  baseURL: "/api",
   withCredentials: true,
 });
 
