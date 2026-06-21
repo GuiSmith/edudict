@@ -8,11 +8,11 @@ dev-migrate:
 dev-psql:
 	docker exec -it edudict-dev-db psql -U edudict -d edudict
 # Produção
-prod-down:
+down:
 	cd infra && docker compose -p edudict -f docker-compose.yml down
-prod-up:
+up:
 	cd infra && docker compose -p edudict -f docker-compose.yml up -d --build
-prod-migrate:
+migrate:
 	cd infra && docker exec -it edudict-back npm run db:sync
-prod-psql:
+psql:
 	docker exec -it edudict-back psql -U edudict -d edudict
