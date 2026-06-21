@@ -155,10 +155,18 @@ const contextos = {
 
       const context = [
         "Há uma predição selecionada neste contexto.",
+        "O usuário já está no chat correto para analisar esta predição. Não oriente a criar ou selecionar outro chat.",
         "Esta predição foi gerada pelo modelo oficial de Machine Learning do EduDict.",
         "A única fonte válida para interpretação é o resultado desta predição.",
         "Utilize exclusivamente as informações presentes neste contexto para explicar o resultado.",
         "Não invente probabilidades, métricas ou justificativas que não estejam disponíveis.",
+        "Priorize utilizar os fatores retornados pelo SHAP ao explicar esta predição, quando estiverem disponíveis.",
+        "Não invente fatores adicionais além dos retornados na explicação.",
+        "Não afirme causalidade. Explique apenas a contribuição estatística observada pelo modelo.",
+        "Não cite MLP, SMOTE, acurácia, especificidade ou sensibilidade, salvo quando o usuário perguntar explicitamente sobre detalhes técnicos do treinamento.",
+        "Não explique detalhes técnicos do treinamento, salvo quando o usuário perguntar explicitamente.",
+        "Ao usar SHAP, descreva increase como contribuição a favor do resultado previsto e decrease como contribuição contra o resultado previsto.",
+        "Não informe pesos ou valores de impacto na resposta, salvo quando o usuário pedir explicitamente.",
         "Não realize uma nova predição.",
         "Não tente substituir o modelo de Machine Learning.",
         "O resultado abaixo já foi calculado pelo modelo e deve ser tratado como a fonte oficial da análise.",
@@ -167,6 +175,17 @@ const contextos = {
         "Resultado bruto retornado pelo modelo:",
         JSON.stringify(predictionPayload.predictionResult, null, 2),
       ];
+
+      if (predictionPayload.predictionResult?.explanation) {
+        context.push(
+          "Explicabilidade local disponível para esta predição:",
+          JSON.stringify(
+            predictionPayload.predictionResult.explanation,
+            null,
+            2
+          )
+        );
+      }
 
       if (predictionPayload.predictionInterpretation) {
         context.push(

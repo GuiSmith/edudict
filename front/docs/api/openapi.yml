@@ -116,6 +116,14 @@ paths:
                     probabilities:
                       Aprovado: 0.82
                       Reprovado: 0.18
+                    explanation:
+                      method: shap
+                      prediction_label: Aprovado
+                      top_factors:
+                        - feature: failures
+                          value: 0
+                          direction: increase
+                          impact: 0.1234
         "400":
           description: Payload invalido no backend ou recusado pelo servico de predicao.
           content:
@@ -953,6 +961,7 @@ components:
         - prediction
         - label
         - probabilities
+        - explanation
       properties:
         success:
           type: boolean
@@ -973,6 +982,47 @@ components:
           example:
             Aprovado: 0.82
             Reprovado: 0.18
+        explanation:
+          oneOf:
+            - $ref: "#/components/schemas/ShapExplanation"
+            - type: "null"
+          description: Explicação local SHAP. Será null se a explicação falhar, sem invalidar a predição.
+    ShapExplanation:
+      type: object
+      required:
+        - method
+        - prediction_label
+        - top_factors
+      properties:
+        method:
+          type: string
+          const: shap
+        prediction_label:
+          type: string
+          example: Reprovado
+        top_factors:
+          type: array
+          maxItems: 5
+          items:
+            type: object
+            required:
+              - feature
+              - value
+              - direction
+              - impact
+            properties:
+              feature:
+                type: string
+                example: failures
+              value:
+                description: Valor original utilizado na predição.
+              direction:
+                type: string
+                enum: [increase, decrease]
+              impact:
+                type: number
+                format: float
+                example: 0.1234
     StudentApprovalPredictionHistoryItem:
       allOf:
         - $ref: "#/components/schemas/StudentApprovalPredictionRequest"
