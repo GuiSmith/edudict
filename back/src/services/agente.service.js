@@ -104,7 +104,17 @@ const contextos = {
       "O sistema possui integração com um serviço de LLM para geração de respostas dentro dos chats.",
       "O contexto enviado ao LLM é controlado pelo back-end.",
       "O back-end é responsável por restringir os assuntos permitidos ao agente.",
-      "O objetivo principal do sistema é combinar Machine Learning e Inteligência Artificial Generativa para explicar resultados de predições acadêmicas."
+      "O objetivo principal do sistema é combinar Machine Learning e Inteligência Artificial Generativa para explicar resultados de predições acadêmicas.",
+      "O agente não possui acesso ao histórico completo de predições do usuário.",
+      "O agente não pode pesquisar, localizar ou recuperar predições por ID.",
+      "O agente não pode acessar predições que não foram explicitamente enviadas no contexto atual.",
+      "O agente não pode comparar duas ou mais predições.",
+      "Cada chat de análise está vinculado a no máximo uma predição.",
+      "O agente somente pode interpretar a predição explicitamente enviada no contexto atual da conversa.",
+      "Quando o usuário mencionar IDs de predição, o agente não deve assumir acesso a essas informações.",
+      "O agente nunca deve solicitar que o usuário informe um ID de predição para obter uma análise.",
+      "O agente nunca deve sugerir comparação entre predições.",
+      "Chats criados sem uma predição vinculada não possuem dados suficientes para análise de resultados preditivos."
     ]
   },
   "Projeto": {
@@ -150,6 +160,17 @@ const contextos = {
           "Se o usuário pedir interpretação de uma predição, informe que nenhuma predição foi selecionada.",
           "Oriente o usuário a selecionar uma predição na interface do chat para obter uma explicação contextualizada.",
           "Não use features soltas fornecidas pelo usuário para simular uma predição.",
+          "Nenhuma predição foi selecionada neste contexto.",
+          "Você não pode interpretar, explicar ou inferir resultados de predição sem uma predição selecionada.",
+          "Você não possui acesso ao histórico de predições do usuário.",
+          "Você não pode pesquisar, localizar ou recuperar predições por ID.",
+          "Você não pode comparar predições entre si.",
+          "Você não pode acessar predições que não foram explicitamente enviadas neste contexto.",
+          "Se o usuário mencionar IDs de predição, informe que você não possui acesso a essas informações.",
+          "Se o usuário pedir interpretação de uma predição, informe que nenhuma predição foi selecionada.",
+          "Não sugira que o usuário informe um ID para obter uma análise.",
+          "Oriente o usuário a iniciar uma análise a partir de uma predição existente na tela de histórico de predições.",
+          "Não use features soltas fornecidas pelo usuário para simular uma predição."
         ];
       }
 
@@ -170,6 +191,7 @@ const contextos = {
         "Não realize uma nova predição.",
         "Não tente substituir o modelo de Machine Learning.",
         "O resultado abaixo já foi calculado pelo modelo e deve ser tratado como a fonte oficial da análise.",
+        "O agente pode analisar apenas esta predição específica e não pode compará-la com outras predições.",
         "Dados de entrada utilizados na predição:",
         JSON.stringify(predictionPayload.predictionInput, null, 2),
         "Resultado bruto retornado pelo modelo:",
