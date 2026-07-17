@@ -19,9 +19,7 @@ services:
       - edudict-network
 
   edudict-back:
-    build:
-      context: ../back
-      dockerfile: Dockerfile
+    image: guismith/edudict-back:latest
     container_name: edudict-back
     env_file:
       - .env
@@ -40,9 +38,7 @@ services:
       - student-approval-network
 
   edudict-front:
-    build:
-      context: ../front
-      dockerfile: Dockerfile
+    image: guismith/edudict-front:latest
     container_name: edudict-front
     restart: unless-stopped
     ports:
