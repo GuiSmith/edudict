@@ -30,3 +30,7 @@ migrate:
 	docker exec -it edudict-back npm run db:sync
 psql:
 	docker exec -it edudict-back psql -U edudict -d edudict
+
+# Backup
+bkp:
+	bash infra/backup.sh "$(BKP_DIR)"
